@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Best Teaching Practices – AI-Supercharged Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F1B33;
+  --bg2:#16264A;
+  --panel:#1B2E57;
+  --border:#3B5590;
+  --border-light:#2A4179;
+  --ink:#F3F6FF;
+  --muted:#A9B6D3;
+  --red:#FF4D5A;
+  --blue:#3D8BFF;
+  --yellow:#FFD449;
+  --green:#3ED598;
+  --iron:#8A94A8;
+  --head:'Fredoka',system-ui,sans-serif;
+  --body:'Nunito',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  height:100%;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  overflow:hidden;
+}
+button{font-family:var(--body);cursor:pointer}
+button:focus-visible,.item:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+
+/* FX & Background Star Canvas */
+#bg,#fx{position:fixed;inset:0;pointer-events:none}
+#bg{z-index:0}
+#fx{z-index:90}
+
+/* Top progress line */
+#prog{
+  position:fixed;top:0;left:0;height:4px;width:0;
+  background:linear-gradient(90deg,var(--blue),var(--yellow),var(--green));
+  z-index:30;transition:width .4s ease;
+}
+
+/* Deck shell */
+#deck{position:fixed;inset:0;z-index:5}
+.slide{
+  position:absolute;inset:0;padding:48px 64px 84px;
+  display:flex;flex-direction:column;justify-content:center;
+  opacity:0;pointer-events:none;transform:translateX(50px) scale(.98);
+  transition:opacity .45s ease,transform .45s ease;overflow-y:auto;overflow-x:hidden;
+}
+.slide.active{opacity:1;pointer-events:auto;transform:none}
+.slide.prev{transform:translateX(-50px) scale(.98)}
+
+/* Typography */
+.chapter{
+  color:var(--yellow);font-family:var(--head);font-weight:600;font-size:18px;margin-bottom:8px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+h1{font-family:var(--head);font-weight:700;font-size:clamp(40px,5.4vw,76px);line-height:1.06;letter-spacing:-.01em}
+h2{font-family:var(--head);font-weight:700;font-size:clamp(30px,3.8vw,52px);line-height:1.1;margin-bottom:12px}
+h3{font-family:var(--head);font-weight:600;font-size:clamp(19px,2.2vw,25px);margin-bottom:6px}
+p,li{font-size:clamp(16px,1.4vw,21px);line-height:1.5;font-weight:500}
+.sub{font-size:clamp(17px,1.7vw,23px);color:var(--muted);margin-bottom:18px;max-width:38ch;line-height:1.4}
+strong{color:var(--yellow);font-weight:800}
+ul.dots{list-style:none;display:grid;gap:12px}
+ul.dots li{position:relative;padding-left:30px}
+ul.dots li::before{
+  content:"";position:absolute;left:0;top:.5em;width:13px;height:13px;border-radius:50%;
+  background:var(--yellow);box-shadow:0 0 10px rgba(255,212,73,0.4);
+}
+.hint{color:var(--muted);font-size:15px;margin-top:14px}
+
+/* Common Layout Components */
+.two{display:grid;grid-template-columns:1fr 1.05fr;gap:40px;height:100%;align-items:center}
+.panel{background:var(--panel);border-radius:22px;padding:22px 26px;border:1px solid var(--border-light)}
+.btn{
+  border:0;border-radius:999px;padding:11px 22px;font-size:16px;font-weight:800;
+  background:var(--yellow);color:#1a1a1a;transition:transform .15s,background .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:hover{transform:translateY(-2px);background:#ffe066}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--border)}
+.btn.ghost:hover{background:var(--border-light);border-color:var(--yellow);color:var(--yellow)}
+.btn.small{padding:7px 15px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* 3D Canvas Stages */
+.stage{
+  position:relative;width:100%;height:100%;min-height:410px;border-radius:24px;
+  background:radial-gradient(circle at 50% 40%,#22396B 0%,var(--bg2) 60%,var(--bg) 100%);
+  overflow:hidden;box-shadow:inset 0 0 0 2px #24396A;
+}
+.stage canvas{width:100%!important;height:100%!important;display:block;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .tag{position:absolute;left:18px;bottom:14px;color:var(--muted);font-size:14px;font-weight:700}
+.stage .tools{position:absolute;right:16px;top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+/* Bottom Navigation Bar */
+#nav{
+  position:fixed;left:0;right:0;bottom:0;height:68px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 36px;
+  background:linear-gradient(to top,rgba(15,27,51,.96),rgba(15,27,51,0));z-index:20;
+}
+#dots{display:flex;gap:8px}
+#dots span{width:10px;height:10px;border-radius:50%;background:#2E4477;cursor:pointer;transition:background .3s,transform .3s}
+#dots span.on{background:var(--yellow);transform:scale(1.35)}
+.navbtn{
+  width:44px;height:44px;border-radius:50%;border:2px solid var(--border);
+  background:var(--panel);color:var(--ink);font-size:20px;display:grid;place-items:center;
+  transition:.2s;
+}
+.navbtn:hover{background:var(--border-light);transform:scale(1.05)}
+#count{color:var(--muted);font-weight:800;font-size:15px;min-width:64px;text-align:center}
+.navgroup{display:flex;gap:10px;align-items:center}
+
+/* Top header controls */
+.topbar{position:fixed;top:14px;left:36px;right:36px;display:flex;justify-content:space-between;align-items:center;z-index:20}
+.topbtn{
+  background:var(--panel);border:2px solid var(--border-light);color:var(--ink);
+  border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700;
+  display:inline-flex;align-items:center;gap:6px;transition:.2s;
+}
+.topbtn:hover{background:var(--border-light);border-color:var(--border)}
+
+/* Chhattisgarh & Presenter Badges */
+.johar-badge{
+  background:linear-gradient(135deg, rgba(255,170,0,0.22), rgba(255,77,90,0.18));
+  border:1.5px solid #FFB300;
+  color:#FFE28A;
+  font-weight:800;
+  font-size:13.5px;
+  padding:4px 14px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 0 16px rgba(255,179,0,0.25);
+  letter-spacing:.02em;
+}
+
+/* Presenter Card */
+.presenter-card{
+  margin-top:20px;
+  background:linear-gradient(135deg, rgba(27,46,87,0.85), rgba(15,27,51,0.92));
+  border:1.5px solid var(--border);
+  border-left:4px solid var(--yellow);
+  border-radius:16px;
+  padding:10px 16px;
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.35);
+}
+.presenter-avatar-wrap{
+  width:46px;height:46px;border-radius:50%;overflow:hidden;
+  border:2px solid var(--yellow);flex-shrink:0;
+  background:var(--bg2);display:grid;place-items:center;
+}
+.presenter-thumb{width:100%;height:100%;object-fit:cover}
+.presenter-thumb-fallback{
+  font-family:var(--head);font-weight:700;font-size:16px;color:var(--yellow);
+}
+.presenter-meta{display:flex;flex-direction:column;gap:1px}
+.presenter-by{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.presenter-name{font-family:var(--head);font-size:18px;font-weight:700;color:#FFF;line-height:1.2}
+.presenter-role{font-size:12.5px;color:var(--muted);font-weight:600}
+
+/* Slide 1 Avatar & Photo */
+.avatar-orbit{
+  position:relative;width:min(280px,62vw);aspect-ratio:1;display:grid;place-items:center;margin:0 auto;
+}
+.avatar-orbit::before{
+  content:'';position:absolute;inset:0;border:2px dashed #2E4477;border-radius:50%;
+  animation:spin 36s linear infinite;
+}
+.avatar-core{
+  position:relative;width:52%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 40% 40%, #2A437C 0%, #15244A 100%);
+  box-shadow:0 0 36px rgba(61,139,255,0.45), 0 0 15px rgba(255,212,73,0.3);
+  border:3px solid var(--yellow);
+  cursor:pointer;animation:float 3.5s ease-in-out infinite;overflow:hidden;
+  display:grid;place-items:center;
+}
+.avatar-core.wave{animation:wave .8s}
+.avatar-img{
+  width:100%;height:100%;object-fit:cover;border-radius:50%;
+  transition:transform .3s;
+}
+.avatar-core:hover .avatar-img{transform:scale(1.06)}
+.avatar-fallback{
+  font-size:clamp(54px,7vw,80px);line-height:1;user-select:none;
+}
+.avatar-orbit .orb-item{position:absolute;inset:0;animation:spin 16s linear infinite;animation-delay:var(--d)}
+.avatar-orbit .orb-item span{
+  position:absolute;top:-.6em;left:50%;margin-left:-.6em;font-size:34px;
+  animation:spinr 16s linear infinite;animation-delay:var(--d);
+}
+.speech-bubble{
+  position:absolute;top:-8px;right:-14px;background:#fff;color:#101a30;font-weight:800;
+  border-radius:14px 14px 14px 3px;padding:8px 14px;font-size:14px;max-width:230px;
+  opacity:0;transform:scale(.5);transform-origin:bottom left;transition:.3s cubic-bezier(.3,1.6,.5,1);
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);z-index:10;
+}
+.speech-bubble.on{opacity:1;transform:scale(1)}
+
+/* Photo URL Input Bar */
+.photo-url-bar{
+  width:100%;max-width:340px;
+  background:rgba(11,20,38,0.9);border:1.5px solid var(--border);
+  border-radius:999px;padding:4px 6px 4px 12px;
+  display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.3);
+}
+.photo-url-icon{font-size:14px}
+.photo-url-input{
+  flex:1;background:transparent;border:0;outline:none;
+  color:var(--ink);font-family:var(--body);font-size:12.5px;min-width:0;
+}
+.photo-url-input::placeholder{color:rgba(169,182,211,0.5)}
+
+/* Slide 2 3-Pillars Flow */
+.flow-grid{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;
+  gap:18px;margin:24px 0 16px;
+}
+.flow-card{
+  background:var(--panel);border:2px solid var(--border-light);border-radius:22px;
+  padding:24px 20px;text-align:center;opacity:.45;transform:scale(.95);transition:.45s ease;
+}
+.flow-card.lit{
+  opacity:1;transform:scale(1);border-color:var(--c);
+  box-shadow:0 0 28px rgba(61,139,255,0.25),inset 0 0 16px rgba(255,255,255,0.06);
+}
+.flow-card .ic{font-size:clamp(38px,5vw,56px);margin-bottom:8px}
+.flow-card h3{color:var(--c);margin-bottom:4px}
+.flow-card p{font-size:15px;color:var(--muted)}
+.flow-arr{font-size:36px;color:#2E4477;text-align:center;transition:.3s}
+.flow-arr.lit{color:var(--yellow);text-shadow:0 0 14px var(--yellow);animation:nudge .6s infinite alternate}
+@keyframes nudge{to{transform:translateX(6px)}}
+.flow-track{height:8px;border-radius:99px;background:var(--bg2);overflow:hidden;margin-bottom:18px}
+.flow-track i{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,var(--blue),var(--yellow),var(--green));
+  transition:width 2.2s linear;
+}
+
+/* Slide 3 Pillar 1: Planning Redesign - High-Contrast Educational Design */
+.planner-panel{
+  background:linear-gradient(165deg, #182A52 0%, #0F1E3A 60%, #0B172E 100%);
+  border:2px solid #3B5FA8;
+  border-radius:24px;
+  padding:22px;
+  display:flex;
+  flex-direction:column;
+  gap:13px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+  position:relative;
+}
+.planner-studio-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-bottom:2px;
+}
+.studio-badge{
+  font-size:12px;
+  font-weight:800;
+  color:#3ED598;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.studio-badge::before{
+  content:'';
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#3ED598;
+  box-shadow:0 0 10px #3ED598;
+  animation:blink 1.4s infinite;
+}
+.studio-tags{
+  display:flex;
+  gap:6px;
+}
+.studio-tag{
+  background:rgba(61,139,255,0.15);
+  color:#A3CAFF;
+  border:1px solid rgba(61,139,255,0.3);
+  font-size:11px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:999px;
+}
+
+/* Modern AI Terminal Card */
+.prompt-box-modern{
+  background:#081122;
+  border:1.5px solid #2B457D;
+  border-left:4px solid var(--yellow);
+  border-radius:16px;
+  padding:12px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  box-shadow:inset 0 2px 10px rgba(0,0,0,0.45);
+}
+.prompt-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  font-weight:800;
+  color:var(--muted);
+  letter-spacing:.03em;
+}
+.prompt-badge{
+  background:rgba(255,212,73,0.18);
+  color:var(--yellow);
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border:1px solid rgba(255,212,73,0.35);
+}
+.prompt-code{
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  color:#C6DEFF;
+  font-size:13.5px;
+  line-height:1.45;
+  background:rgba(0,0,0,0.22);
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.cur{display:inline-block;width:7px;height:1em;background:var(--yellow);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.timeline-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 2px;
+}
+.timer-pill{
+  font-family:var(--head);
+  font-size:15px;
+  font-weight:800;
+  color:var(--yellow);
+  background:linear-gradient(135deg,rgba(255,212,73,0.2),rgba(255,212,73,0.06));
+  border:1.5px solid var(--yellow);
+  padding:4px 14px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 0 14px rgba(255,212,73,0.25);
+}
+
+.timeline-wrap{position:relative;width:100%;margin:2px 0}
+.timeline-grid{
+  display:grid;
+  grid-template-columns:1fr 2fr 2fr 1.5fr;
+  gap:9px;
+  width:100%;
+}
+.timeline-block{
+  border-radius:16px;
+  padding:12px 8px;
+  cursor:pointer;
+  text-align:center;
+  transition:all .24s cubic-bezier(.3,1.4,.4,1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  user-select:none;
+  position:relative;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+}
+.timeline-block .b-ic{font-size:24px;line-height:1}
+.timeline-block .b-title{font-family:var(--head);font-weight:700;font-size:15.5px;line-height:1.15;color:#fff}
+.timeline-block .b-time{
+  font-size:11px;
+  font-weight:800;
+  padding:2px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,0.45);
+  letter-spacing:.02em;
+  color:#fff;
+}
+.timeline-block .b-sub{
+  font-size:10px;
+  font-weight:700;
+  opacity:0.9;
+  letter-spacing:.02em;
+}
+
+/* Distinct phase card identities with vibrant glowing gradients */
+.timeline-block.hook{
+  background:linear-gradient(145deg, rgba(255,77,90,0.32), rgba(255,77,90,0.12));
+  border:2px solid #FF4D5A;
+}
+.timeline-block.hook .b-sub{color:#FFB5BA}
+
+.timeline-block.concept{
+  background:linear-gradient(145deg, rgba(61,139,255,0.32), rgba(61,139,255,0.12));
+  border:2px solid #3D8BFF;
+}
+.timeline-block.concept .b-sub{color:#B5D5FF}
+
+.timeline-block.activity{
+  background:linear-gradient(145deg, rgba(62,213,152,0.32), rgba(62,213,152,0.12));
+  border:2px solid #3ED598;
+}
+.timeline-block.activity .b-sub{color:#B8F5DA}
+
+.timeline-block.wrapup{
+  background:linear-gradient(145deg, rgba(255,212,73,0.32), rgba(255,212,73,0.12));
+  border:2px solid #FFD449;
+}
+.timeline-block.wrapup .b-sub{color:#FFF1B5}
+
+.timeline-block:hover{
+  transform:translateY(-3px);
+  filter:brightness(1.18);
+  box-shadow:0 8px 22px rgba(0,0,0,0.35);
+}
+.timeline-block.sel{
+  transform:translateY(-4px) scale(1.04);
+  filter:brightness(1.25);
+}
+.timeline-block.hook.sel{
+  box-shadow:0 0 25px rgba(255,77,90,0.85), 0 8px 22px rgba(0,0,0,0.4);
+  background:linear-gradient(145deg, rgba(255,77,90,0.6), rgba(255,77,90,0.3));
+  border-color:#FFF;
+}
+.timeline-block.concept.sel{
+  box-shadow:0 0 25px rgba(61,139,255,0.85), 0 8px 22px rgba(0,0,0,0.4);
+  background:linear-gradient(145deg, rgba(61,139,255,0.6), rgba(61,139,255,0.3));
+  border-color:#FFF;
+}
+.timeline-block.activity.sel{
+  box-shadow:0 0 25px rgba(62,213,152,0.85), 0 8px 22px rgba(0,0,0,0.4);
+  background:linear-gradient(145deg, rgba(62,213,152,0.6), rgba(62,213,152,0.3));
+  border-color:#FFF;
+}
+.timeline-block.wrapup.sel{
+  box-shadow:0 0 25px rgba(255,212,73,0.85), 0 8px 22px rgba(0,0,0,0.4);
+  background:linear-gradient(145deg, rgba(255,212,73,0.6), rgba(255,212,73,0.3));
+  border-color:#FFF;
+}
+
+.scrubber-wrap{
+  position:relative;
+  margin-top:6px;
+}
+.scrubber-track{
+  height:7px;
+  border-radius:999px;
+  background:#081122;
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.scrubber-fill{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg, #FF4D5A 0%, #3D8BFF 35%, #3ED598 70%, #FFD449 100%);
+  transition:width .06s linear;
+  border-radius:999px;
+  box-shadow:0 0 10px rgba(255,255,255,0.4);
+}
+.scrubber-milestones{
+  display:flex;
+  justify-content:space-between;
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--muted);
+  margin-top:3px;
+  padding:0 2px;
+}
+
+/* Phase detail strategy card */
+.phase-card{
+  background:#081122;
+  border-radius:16px;
+  border:1.5px solid #2B457D;
+  padding:12px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  min-height:86px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.35);
+}
+.phase-card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.phase-pill{
+  font-family:var(--head);
+  font-weight:700;
+  font-size:13px;
+  padding:4px 10px;
+  border-radius:8px;
+  background:rgba(255,212,73,0.16);
+  color:var(--yellow);
+  border:1px solid rgba(255,212,73,0.35);
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.phase-goal{
+  font-size:11.5px;
+  font-weight:800;
+  color:#3ED598;
+  background:rgba(62,213,152,0.12);
+  padding:3px 9px;
+  border-radius:999px;
+  border:1px solid rgba(62,213,152,0.3);
+}
+.phase-dialogue{
+  font-size:13.5px;
+  line-height:1.45;
+  color:var(--ink);
+  background:rgba(255,255,255,0.03);
+  padding:6px 10px;
+  border-radius:0 8px 8px 0;
+  border-left:3px solid var(--yellow);
+}
+.phase-insight{
+  font-size:11.5px;
+  color:var(--muted);
+  line-height:1.35;
+}
+
+/* Differentiated switcher */
+.track-switcher{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#081122;
+  border-radius:999px;
+  padding:4px;
+  border:1.5px solid #2B457D;
+  gap:4px;
+}
+.track-tab-btn{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:13.5px;
+  font-weight:800;
+  transition:.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.track-tab-btn:hover{color:var(--ink)}
+.track-tab-btn.on{
+  box-shadow:0 4px 12px rgba(0,0,0,0.35);
+}
+.track-tab-btn.basic-tab.on{
+  background:linear-gradient(135deg,rgba(62,213,152,0.22),rgba(62,213,152,0.08));
+  border:1.5px solid var(--green);
+  color:var(--green);
+}
+.track-tab-btn.adv-tab.on{
+  background:linear-gradient(135deg,rgba(61,139,255,0.22),rgba(61,139,255,0.08));
+  border:1.5px solid var(--blue);
+  color:var(--blue);
+}
+
+.track-detail-card{
+  background:#081122;
+  border-radius:16px;
+  border:1.5px solid #2B457D;
+  padding:12px 16px;
+  font-size:13.5px;
+  line-height:1.45;
+  color:var(--ink);
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.35);
+}
+.track-detail-card strong{color:var(--yellow);font-weight:700}
+.track-detail-tip{
+  font-size:12px;
+  color:var(--muted);
+  border-top:1px dashed rgba(255,255,255,0.08);
+  padding-top:4px;
+  margin-top:2px;
+}
+
+/* Slide 4 Pillar 2: 3D Types of Magnets */
+.typebar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.typebar button{
+  border:2px solid var(--border);background:transparent;color:var(--ink);border-radius:999px;
+  padding:8px 16px;font-size:15px;font-weight:800;transition:.2s;
+}
+.typebar button.on{background:var(--yellow);color:#1a1a1a;border-color:var(--yellow)}
+.type-desc{min-height:115px;background:var(--panel);border-radius:18px;padding:16px 20px;border:1px solid var(--border-light)}
+.type-desc h3{color:var(--yellow);margin-bottom:4px}
+.type-desc p{font-size:16px;color:var(--muted)}
+
+/* Slide 5: Bubble Shooter Target Sum Game */
+.bubble-game-wrap{
+  display:grid;grid-template-columns:1fr 1.25fr;gap:28px;align-items:center;height:100%;
+}
+.bubble-arena{
+  position:relative;width:100%;min-height:380px;background:radial-gradient(circle at 50% 50%,#1B2E57 0%,#16264A 60%,#0F1B33 100%);
+  border-radius:24px;border:2px solid var(--border);padding:20px;display:flex;flex-direction:column;gap:14px;
+  box-shadow:inset 0 0 20px rgba(0,0,0,0.5);overflow:hidden;
+}
+.target-banner{
+  background:#0B1426;border:2px solid var(--yellow);border-radius:18px;padding:12px 20px;
+  display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 20px rgba(255,212,73,0.25);
+}
+.target-val-box{
+  display:flex;align-items:baseline;gap:8px;font-family:var(--head);
+}
+.target-label{font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.target-num{font-size:36px;font-weight:700;color:var(--yellow);line-height:1}
+.bubble-stats{
+  display:flex;gap:12px;font-size:14px;font-weight:800;color:var(--ink);
+}
+.bubble-stat-pill{
+  background:var(--bg2);padding:6px 12px;border-radius:999px;border:1px solid var(--border-light);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.bubble-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex:1;align-content:center;
+}
+.bubble-btn{
+  aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,0.2);
+  background:radial-gradient(circle at 35% 35%,rgba(255,255,255,0.4) 0%,var(--c,var(--blue)) 50%,#091530 100%);
+  color:#FFF;font-family:var(--head);font-size:clamp(22px,2.4vw,32px);font-weight:700;
+  display:grid;place-items:center;cursor:pointer;user-select:none;transition:transform .2s,filter .2s,box-shadow .2s;
+  box-shadow:0 6px 16px rgba(0,0,0,0.35),inset 0 2px 4px rgba(255,255,255,0.5);
+  animation:bubbleFloat 3s ease-in-out infinite alternate;animation-delay:var(--del,0s);
+}
+@keyframes bubbleFloat{
+  from{transform:translateY(0)}
+  to{transform:translateY(-6px)}
+}
+.bubble-btn:hover{
+  transform:scale(1.1) translateY(-4px);filter:brightness(1.2);
+  box-shadow:0 0 20px var(--c,var(--blue)),0 8px 24px rgba(0,0,0,0.5);
+}
+.bubble-btn.sel{
+  border-color:#FFF;transform:scale(1.14);filter:brightness(1.3);
+  box-shadow:0 0 24px #FFF,0 0 35px var(--c,var(--blue));
+  animation:none;
+}
+.bubble-btn.popping{
+  animation:popOut .35s forwards;
+}
+@keyframes popOut{
+  0%{transform:scale(1.2)}
+  50%{transform:scale(1.4);opacity:.8;filter:brightness(2)}
+  100%{transform:scale(0);opacity:0}
+}
+.bubble-btn.shake-err{
+  animation:shakeErr .4s;border-color:var(--red);
+}
+@keyframes shakeErr{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  75%{transform:translateX(8px)}
+}
+.bubble-feedback{
+  min-height:36px;font-size:15px;font-weight:800;text-align:center;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+}
+.bubble-feedback.ok{color:var(--green)}
+.bubble-feedback.bad{color:var(--red)}
+
+/* Slide 6: 10-Question Diagnostic Assessment & Evaluation Report */
+.diag-container{
+  display:grid;grid-template-columns:1.05fr 1.15fr;gap:28px;align-items:stretch;height:100%;
+}
+.diag-q-card{
+  background:var(--panel);border:1.5px solid var(--border);border-radius:22px;
+  padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 12px 30px rgba(0,0,0,0.35);
+}
+.diag-progress-bar{
+  height:7px;background:var(--bg2);border-radius:999px;overflow:hidden;
+}
+.diag-progress-fill{
+  height:100%;width:10%;background:linear-gradient(90deg,var(--blue),var(--yellow));
+  transition:width .3s ease;
+}
+.diag-q-text{
+  font-family:var(--head);font-size:clamp(17px,1.7vw,22px);font-weight:600;line-height:1.35;
+  color:var(--ink);min-height:55px;display:flex;align-items:center;
+}
+.diag-opts-grid{
+  display:grid;grid-template-columns:1fr;gap:8px;
+}
+.diag-opt{
+  background:var(--bg2);border:1.5px solid var(--border-light);color:var(--ink);
+  border-radius:12px;padding:10px 14px;font-size:15px;font-weight:700;cursor:pointer;
+  text-align:left;transition:all .18s;display:flex;align-items:center;gap:10px;
+}
+.diag-opt:hover:not(:disabled){
+  background:#203565;border-color:var(--yellow);transform:translateX(4px);
+}
+.diag-opt.correct{
+  background:#144a30!important;border-color:var(--green)!important;color:#fff!important;
+  box-shadow:0 0 16px rgba(62,213,152,0.4);
+}
+.diag-opt.wrong{
+  background:#5a1922!important;border-color:var(--red)!important;color:#fff!important;
+  animation:shakeErr .35s;
+}
+.diag-opt:disabled{cursor:default}
+.diag-explain{
+  font-size:13.5px;color:var(--muted);background:rgba(0,0,0,0.25);padding:10px 12px;
+  border-radius:10px;border-left:3px solid var(--yellow);min-height:40px;line-height:1.4;
+}
+
+/* Evaluation Report Card */
+.eval-card{
+  background:var(--panel);border:2px solid var(--border);border-radius:22px;
+  padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 14px 35px rgba(0,0,0,0.4);
+  position:relative;overflow:hidden;
+}
+.eval-header{
+  display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-light);
+  padding-bottom:10px;
+}
+.eval-student-badge{
+  font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;
+}
+.eval-score-banner{
+  background:radial-gradient(circle at 50% 50%,#203565 0%,#111d3b 100%);
+  border:1.5px solid var(--yellow);border-radius:16px;padding:12px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.eval-score-num{
+  font-family:var(--head);font-size:32px;font-weight:700;color:var(--yellow);line-height:1;
+}
+.eval-score-sub{font-size:13px;color:var(--muted);font-weight:700}
+.eval-bars-group{
+  display:grid;gap:8px;
+}
+.competency-item{
+  display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:700;
+}
+.competency-meta{display:flex;justify-content:space-between;color:var(--muted)}
+.competency-track{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.competency-fill{height:100%;border-radius:99px;transition:width .6s ease}
+
+.diagnosis-box{
+  background:rgba(255,77,90,0.12);border:1.5px solid rgba(255,77,90,0.4);border-radius:12px;
+  padding:10px 12px;font-size:13px;line-height:1.45;color:#ffccd0;
+}
+.prescription-box{
+  background:rgba(62,213,152,0.12);border:1.5px solid rgba(62,213,152,0.4);border-radius:12px;
+  padding:10px 12px;font-size:13px;line-height:1.45;color:#d0f5e4;
+}
+
+/* Slide 6 Synergy */
+.duo{display:grid;grid-template-columns:1fr 50px 1fr;align-items:center;gap:8px;width:100%;margin-bottom:14px}
+.who{
+  border-radius:18px;padding:14px;text-align:center;font-weight:800;font-size:16px;color:#101a30;
+}
+.who.ai{background:linear-gradient(160deg,#74c0fc,#3d8bff)}
+.who.tc{background:linear-gradient(160deg,#faa2c1,#ff4d5a)}
+.who .big{display:block;font-size:46px;animation:float 3.2s infinite}
+.who ul{list-style:none;font-weight:700;font-size:13px;margin-top:6px;opacity:0;max-height:0;overflow:hidden;transition:.5s}
+.who.open ul{opacity:1;max-height:100px}
+.beam{height:8px;border-radius:9px;background:rgba(255,255,255,0.2);position:relative;overflow:hidden}
+.beam i{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--blue),#fff,var(--red));transition:width .9s}
+.beam.on i{width:100%}
+.hearts-zone{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:22px}
+.hearts-zone span{position:absolute;bottom:20%;font-size:26px;animation:heartUp 2s ease-out forwards}
+@keyframes heartUp{to{transform:translate(var(--dx),-180px);opacity:0}}
+
+/* Keyframes */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinr{to{transform:rotate(-360deg)}}
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) scale(1.1)}60%{transform:rotate(14deg) scale(1.15)}}
+@keyframes grow{from{transform:scaleY(.2)}to{transform:scaleY(1)}}
+
+/* Responsive */
+@media(max-width:900px){
+  .slide{padding:32px 24px 80px}
+  .two{grid-template-columns:1fr}
+  .flow-grid{grid-template-columns:1fr}
+  .flow-arr{transform:rotate(90deg)}
+  .stage{min-height:300px}
+  .topbar{left:18px;right:18px}
+  #nav{padding:0 18px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<canvas id="fx"></canvas>
+<div id="prog"></div>
+
+<!-- Topbar -->
+<div class="topbar">
+  <button class="topbtn" id="sndToggle" title="Toggle Sound">🔊 Sound</button>
+  <button class="topbtn" id="fsToggle" title="Fullscreen (F)">⛶ Fullscreen</button>
+</div>
+
+<div id="deck">
+
+  <!-- 1. HERO TITLE -->
+  <section class="slide active" id="s1">
+    <div class="two">
+      <div>
+        <div class="row" style="gap:10px;margin-bottom:12px">
+          <span class="johar-badge">🌾 जय जोहार, जय छत्तीसगढ़ 🌾</span>
+          <span class="chapter" style="margin-bottom:0">Classroom Best Practices</span>
+        </div>
+        <h1>AI-Powered<br>Teaching</h1>
+        <p class="sub">How educators can implement AI to make lectures <strong>visually rich, structured &amp; 10x engaging</strong>.</p>
+        <ul class="dots">
+          <li><strong>Objective wahi hai</strong> – Delivery aur engagement ka method upgraded.</li>
+          <li><strong>Boring paperwork se azaadi</strong> – Teacher ka focus student mentorship par.</li>
+        </ul>
+
+        <!-- Presenter Card: Presented by Tarun Kaushik -->
+        <div class="presenter-card">
+          <div class="presenter-avatar-wrap">
+            <img id="presenterThumb" class="presenter-thumb" src="https://i.ibb.co/gbM1ZmZZ/Professional-Portrait-in-Plaid-Shirt.png" alt="Tarun Kaushik" style="display:block" onerror="this.style.display='none';$('presenterThumbFallback').style.display='grid'" onload="this.style.display='block';$('presenterThumbFallback').style.display='none'">
+            <div id="presenterThumbFallback" class="presenter-thumb-fallback" style="display:none">TK</div>
+          </div>
+          <div class="presenter-meta">
+            <span class="presenter-by">Presented By</span>
+            <div class="presenter-name">Tarun Kaushik</div>
+            <div class="presenter-role">Educator &amp; AI Pedagogy Lead · Chhattisgarh</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:22px">
+          <button class="btn" onclick="go(1)">See the Framework ➜</button>
+          <button class="btn ghost" id="waveBtn">🌾 जय जोहार बोलिए</button>
+        </div>
+      </div>
+
+      <div class="stage" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:430px;padding:24px 16px;gap:14px">
+        <div class="avatar-orbit">
+          <div class="avatar-core" id="avatarCore" title="Click to wave!">
+            <img id="teacherPhoto" class="avatar-img" src="https://i.ibb.co/gbM1ZmZZ/Professional-Portrait-in-Plaid-Shirt.png" alt="Tarun Kaushik" style="display:block" onerror="this.style.display='none';$('avatarFallback').style.display='grid'" onload="this.style.display='block';$('avatarFallback').style.display='none'">
+            <div id="avatarFallback" class="avatar-fallback" style="display:none">👨‍🏫</div>
+          </div>
+          <div class="orb-item" style="--d:0s"><span>🤖</span></div>
+          <div class="orb-item" style="--d:-4s"><span>📚</span></div>
+          <div class="orb-item" style="--d:-8s"><span>🧲</span></div>
+          <div class="orb-item" style="--d:-12s"><span>📊</span></div>
+          <div class="speech-bubble" id="speechBubble">जय जोहार! 🙏</div>
+        </div>
+
+        <div style="text-align:center">
+          <div style="font-family:var(--head);font-size:20px;font-weight:700;color:var(--yellow)">Tarun Kaushik</div>
+          <p class="hint" style="margin-top:2px">Teacher + AI Co-pilot = Next Gen Learning</p>
+        </div>
+
+        <!-- Quick Image URL Input Box (Tarun can live paste photo link here) -->
+        <div class="photo-url-bar">
+          <span class="photo-url-icon">📷</span>
+          <input type="text" id="photoUrlInput" value="https://i.ibb.co/gbM1ZmZZ/Professional-Portrait-in-Plaid-Shirt.png" placeholder="Teacher Photo URL (paste link here)..." class="photo-url-input">
+          <button class="btn small" id="setPhotoBtn" style="padding:5px 12px;font-size:12.5px">Set Photo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. THE 3 PILLARS -->
+  <section class="slide" id="s2" data-note="<b>(1 min - The 3 Pillars)</b> Har impactful modern lecture in teen aasan pillars par khada hota hai. Pehle — Lesson Planning: preparation time ghanto se घटकर minute ho jaye. Doosra — Lecture Delivery: boring bullet points ratane ke badle live 3D simulations screen par run karein. Teesra — Smart Assessment: class ke ant mein pata chal jaye ki kis student ko kya samajh aaya.">
+    <div class="chapter">Overview</div>
+    <h2>The 3 Pillars of Effective Teaching</h2>
+    <p class="sub" style="max-width:none">A streamlined, visual workflow that turns passive lectures into active discovery:</p>
+
+    <div class="flow-grid" id="flowGrid">
+      <div class="flow-card" style="--c:var(--blue)">
+        <div class="ic">📝</div>
+        <h3>1. Lesson Planning</h3>
+        <p>Syllabus → 45-min engaging flow with hooks &amp; challenges</p>
+      </div>
+      <div class="flow-arr">➜</div>
+      <div class="flow-card" style="--c:var(--yellow)">
+        <div class="ic">🧲</div>
+        <h3>2. Visual Delivery</h3>
+        <p>Text ki jagah Interactive 3D Models &amp; Simulations</p>
+      </div>
+      <div class="flow-arr">➜</div>
+      <div class="flow-card" style="--c:var(--green)">
+        <div class="ic">🎮</div>
+        <h3>3. Smart Assessment</h3>
+        <p>Gamified exercises &amp; live misconception radar</p>
+      </div>
+    </div>
+
+    <div class="flow-track"><i id="flowTrack"></i></div>
+
+    <div class="row" style="justify-content:center;margin-top:8px">
+      <button class="btn" id="runFlowBtn">▶ Run 3-Step Workflow</button>
+      <button class="btn ghost small" id="resetFlowBtn">↺ Reset</button>
+    </div>
+  </section>
+
+  <!-- 3. PILLAR 1: PLANNING -->
+  <section class="slide" id="s3">
+    <div class="two">
+      <div>
+        <div class="chapter">Pillar 1 · Preparation</div>
+        <h2>AI-Automated Lesson Planning</h2>
+        <div class="row" style="gap:8px;margin-bottom:14px">
+          <span style="background:rgba(255,212,73,0.14);border:1px solid rgba(255,212,73,0.35);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:800;color:var(--yellow)">⏱ 2 Hours ➔ 10 Mins Prep</span>
+          <span style="background:rgba(62,213,152,0.14);border:1px solid rgba(62,213,152,0.35);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:800;color:var(--green)">🎯 NCERT 45-Min Standard</span>
+        </div>
+        <ul class="dots">
+          <li><strong>No Heavy Jargon:</strong> Seedhi Hindi/English bhasha mein structured 45-min period.</li>
+          <li><strong>Cognitive Attention Flow:</strong> Hook (5m) ➜ Concept (15m) ➜ 3D Activity (15m) ➜ Wrap-up (10m).</li>
+          <li><strong>Differentiated Tracks:</strong> Struggling learners ke liye intuitive analogies, fast-learners ke liye HOTS challenge.</li>
+        </ul>
+        <div class="row" style="margin-top:22px">
+          <button class="btn" id="genPlanBtn">✨ AI Se 45-Min Plan Banao</button>
+          <button class="btn ghost" id="playPeriodBtn">▶ 45-Min Class Run Karo</button>
+        </div>
+      </div>
+      <div class="planner-panel">
+        <!-- Top Studio Bar -->
+        <div class="planner-studio-top">
+          <span class="studio-badge">Live AI Pedagogy Copilot</span>
+          <div class="studio-tags">
+            <span class="studio-tag">Grade 6 Science</span>
+            <span class="studio-tag">Exploring Magnets</span>
+            <span class="studio-tag">45-Min Class</span>
+          </div>
+        </div>
+
+        <!-- Modern Prompt Card -->
+        <div class="prompt-box-modern">
+          <div class="prompt-header">
+            <span class="prompt-badge">✨ Teacher AI Prompt</span>
+            <span style="font-size:11px;color:#A9B6D3;font-family:ui-monospace">Model: Claude / Gemini Edu · 0.4s</span>
+          </div>
+          <div class="prompt-code">
+            <span style="color:var(--yellow);font-weight:700">Teacher:</span>
+            <span id="promptText">Grade 6 Science: 'Exploring Magnets' ka 45-min lively period plan do — hook, concept, activity aur wrap-up ke sath.</span><i class="cur"></i>
+          </div>
+        </div>
+
+        <!-- Timer & Header -->
+        <div class="timeline-header">
+          <div class="timer-pill" id="periodClock">⏱ 0 / 45 min</div>
+          <span style="color:var(--muted);font-size:13px;font-weight:700">4-Phase Blueprint · Click any card</span>
+        </div>
+
+        <!-- 4 Distinct Vibrant Timeline Blocks -->
+        <div class="timeline-wrap">
+          <div class="timeline-grid" id="timelineBar">
+            <div class="timeline-block hook sel" data-phase="0" data-pill="🪝 Phase 1 · Curiosity Hook (5 min)" data-goal="🎯 Goal: 100% Attention Capture" data-t="Fridge door kyun band rehta hai? Daily life curiosity sawal se shuru karo taaki 100% students attentive ho jayein." data-sub="💡 Attention Span: Pehle 5 minute daily-life curiosity se shuru karne se class kabhi bore nahi hoti.">
+              <span class="b-ic">🪝</span>
+              <span class="b-title">Hook</span>
+              <span class="b-time">5 min</span>
+              <span class="b-sub">Attention (11%)</span>
+            </div>
+            <div class="timeline-block concept" data-phase="1" data-pill="💡 Phase 2 · Core Concept (15 min)" data-goal="🎯 Goal: Foundation &amp; Poles" data-t="What is a magnet + Two poles (North &amp; South) ki live visual demonstration aur attraction/repulsion principle." data-sub="💡 Visual Depth: 2D diagram ke badle color-coded 3D magnet se concepts crystal clear hote hain.">
+              <span class="b-ic">💡</span>
+              <span class="b-title">Concept</span>
+              <span class="b-time">15 min</span>
+              <span class="b-sub">Core Demo (33%)</span>
+            </div>
+            <div class="timeline-block activity" data-phase="2" data-pill="🧪 Phase 3 · Hands-On Activity (15 min)" data-goal="🎯 Goal: Active 3D Testing" data-t="Students live 3D simulation mein alag alag shapes aur magnetic materials explore aur test karte hain." data-sub="💡 Active Discovery: Khud 3D mein interact karne se student retention 75% tak badhta hai.">
+              <span class="b-ic">🧪</span>
+              <span class="b-title">Activity</span>
+              <span class="b-time">15 min</span>
+              <span class="b-sub">3D Lab (33%)</span>
+            </div>
+            <div class="timeline-block wrapup" data-phase="3" data-pill="🎯 Phase 4 · Wrap-up &amp; Check (10 min)" data-goal="🎯 Goal: Diagnostic Gap Radar" data-t="Gamified Bubble Challenge + Instant misconception check. Class end hone se pehle learning gap pakdo." data-sub="💡 Formative Check: Usi din pata lagao ki kiss bache ko single-pole (monopole) confusion hai.">
+              <span class="b-ic">🎯</span>
+              <span class="b-title">Wrap-up</span>
+              <span class="b-time">10 min</span>
+              <span class="b-sub">Gap Check (22%)</span>
+            </div>
+          </div>
+          <!-- Scrubber fill line & Milestones -->
+          <div class="scrubber-wrap">
+            <div class="scrubber-track">
+              <div class="scrubber-fill" id="scrubberFill" style="width:11%"></div>
+            </div>
+            <div class="scrubber-milestones">
+              <span>0m Start</span>
+              <span>5m</span>
+              <span>20m</span>
+              <span>35m</span>
+              <span>45m Bell 🔔</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase Detail Strategy Card -->
+        <div class="phase-card" id="phaseCard">
+          <div class="phase-card-top">
+            <span class="phase-pill" id="phasePill">🪝 Phase 1 · Curiosity Hook (5 min)</span>
+            <span class="phase-goal" id="phaseGoal">🎯 Goal: 100% Attention Capture</span>
+          </div>
+          <div class="phase-dialogue" id="phaseMsg">Fridge door kyun band rehta hai? Daily life curiosity sawal se shuru karo taaki 100% students attentive ho jayein.</div>
+          <div class="phase-insight" id="phaseInsight">💡 Attention Span: Pehle 5 minute daily-life curiosity se shuru karne se class kabhi bore nahi hoti.</div>
+        </div>
+
+        <!-- Differentiated Track Switcher -->
+        <div class="track-switcher">
+          <button class="track-tab-btn basic-tab on" id="btnBasic">🌱 Basic Learner Track</button>
+          <button class="track-tab-btn adv-tab" id="btnAdv">🚀 Fast Learner Track</button>
+        </div>
+
+        <!-- Track Detail Card -->
+        <div class="track-detail-card" id="trackCard">
+          <div><strong style="color:var(--green)">🌱 Foundation Strategy (Basic Learners):</strong> Real-life analogy — 'Jaise cello-tape paper ko pakadti hai, magnet iron ko chipkata hai.'</div>
+          <div class="track-detail-tip">💡 Concrete Scaffolding: Abstract formula batane se pehle concrete physical object touch karwayein.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. PILLAR 2: VISUAL DELIVERY (3D TYPES OF MAGNETS) -->
+  <section class="slide" id="s4" data-note="<b>(3.5 min - Live 3D Simulation)</b> Bullet points padhkar sunana teaching nahi hai. Science textbook mein horseshoe magnet ya electromagnet ki 2D photo hoti hai. Par modern classroom mein teacher screen par interactive 3D model dikhata hai! Dekhiye: student Bar, Horseshoe, Cylindrical, Ring, Button aur Electromagnet ko 3D mein ghuma sakta hai. Electromagnet par 'Switch ON' dabane par current flow hota hai aur iron filings attract ho jaati hain! Jab bacha dekhta hai aur interact karta hai, toh concept hamesha ke liye yaad rehta hai.">
+    <div class="two">
+      <div>
+        <div class="chapter">Pillar 2 · Live Simulation</div>
+        <h2>Visual Delivery — Types of Magnets in 3D</h2>
+        <div class="typebar" id="typebar">
+          <button data-t="bar" class="on">Bar</button>
+          <button data-t="horseshoe">Horseshoe (U-Shape)</button>
+          <button data-t="cylinder">Cylindrical</button>
+          <button data-t="ring">Ring</button>
+          <button data-t="button">Button</button>
+          <button data-t="electro">Electromagnet ⚡</button>
+        </div>
+        <div class="type-desc" id="typeDesc"></div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn small" id="currentBtn" style="display:none">Switch current ON</button>
+          <button class="btn ghost small" id="reset3dBtn">Reset 3D View</button>
+        </div>
+        <p class="hint">Click a shape to inspect in 3D. Drag with mouse/touch to rotate.</p>
+      </div>
+      <div class="stage">
+        <canvas id="c4"></canvas>
+        <div class="tag">🔴 Red = North pole · 🔵 Blue = South pole</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. PILLAR 3A: GAMIFIED ASSESSMENT (BUBBLE SHOOTER TARGET SUM) -->
+  <section class="slide" id="s5">
+    <div class="two bubble-game-wrap">
+      <div>
+        <div class="chapter">Pillar 3A · Gamified Learning Game</div>
+        <h2>Gamified Assessment — Bubble Shooter Sum Challenge</h2>
+        <p class="sub">Zero Exam Anxiety · 100% Active Mental Arithmetic &amp; Cognitive Reflex Assessment</p>
+        <ul class="dots">
+          <li><strong>Target Sum Mechanism:</strong> Do number bubbles select karo jinka sum exact Target banaye.</li>
+          <li><strong>Instant Reflex Feedback:</strong> Sahi sum par bubbles pop hote hain, streak multiply hoti hai!</li>
+          <li><strong>Pedagogical Insight:</strong> Traditional worksheet ke bina teacher ko bache ki computational agility real-time mein assess hoti hai.</li>
+        </ul>
+        <div class="row" style="margin-top:22px">
+          <button class="btn" id="newTargetBtn">🎯 Next Target</button>
+          <button class="btn ghost small" id="resetBubbleBtn">↺ Reset Game</button>
+        </div>
+      </div>
+
+      <!-- Bubble Shooter Arena -->
+      <div class="bubble-arena">
+        <div class="target-banner">
+          <div class="target-val-box">
+            <span class="target-label">Target Sum:</span>
+            <span class="target-num" id="targetSumDisplay">10</span>
+          </div>
+          <div class="bubble-stats">
+            <span class="bubble-stat-pill">🏆 Score: <b id="bubbleScore" style="color:var(--yellow)">0</b></span>
+            <span class="bubble-stat-pill">🔥 <b id="bubbleStreak" style="color:var(--green)">0x</b> Streak</span>
+          </div>
+        </div>
+
+        <div class="bubble-grid" id="bubbleGrid">
+          <!-- 12 Bubbles populated dynamically by JS -->
+        </div>
+
+        <div class="bubble-feedback" id="bubbleFeedback">
+          👆 Pop any 2 bubbles whose sum equals <span id="hintTarget">10</span>!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. PILLAR 3B: 10-QUESTION DIAGNOSTIC ASSESSMENT & EVALUATION REPORT -->
+  <section class="slide" id="s6">
+    <div class="two diag-container">
+      <!-- Left: Interactive 10 Questions -->
+      <div class="diag-q-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="chapter" style="margin-bottom:0">Pillar 3B · Diagnostic Knowledge Assessment</div>
+          <span style="font-weight:800;color:var(--yellow);font-size:14px" id="diagCounter">Q 1 / 10</span>
+        </div>
+
+        <div class="diag-progress-bar">
+          <div class="diag-progress-fill" id="diagProgressFill" style="width:10%"></div>
+        </div>
+
+        <div class="diag-q-text" id="diagQText">
+          Loading Question...
+        </div>
+
+        <div class="diag-opts-grid" id="diagOptsGrid">
+          <!-- 4 option buttons -->
+        </div>
+
+        <div class="diag-explain" id="diagExplain">
+          💡 Select the correct answer to see instant feedback and explanation.
+        </div>
+
+        <div class="row" style="justify-content:space-between;margin-top:auto">
+          <button class="btn small" id="diagNextBtn" style="display:none">Next Question ➜</button>
+          <div class="row">
+            <button class="btn ghost small" id="autoSimulateBtn" title="Demonstrate full student diagnostic score report">⚡ Auto-Simulate (8/10)</button>
+            <button class="btn ghost small" id="resetDiagBtn">↺ Reset Test</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Full Evaluation Report Card -->
+      <div class="eval-card" id="evalCard">
+        <div class="eval-header">
+          <div>
+            <div class="eval-student-badge">Student Diagnostic Report</div>
+            <h3 style="font-size:19px;margin-bottom:0">Rohan Sharma · Class 6-B</h3>
+          </div>
+          <span class="btn small" id="evalStatusPill" style="padding:4px 10px;font-size:12px;background:var(--green)">Live Evaluation</span>
+        </div>
+
+        <div class="eval-score-banner">
+          <div>
+            <div class="eval-score-sub">Overall Accuracy</div>
+            <div class="eval-score-num" id="evalScoreDisplay">8 / 10</div>
+          </div>
+          <div style="text-align:right">
+            <span style="font-weight:800;color:var(--green);font-size:17px" id="evalMasteryTier">Level: Proficient (80%)</span>
+            <div style="font-size:12px;color:var(--muted)">NCERT Science Competency Matrix</div>
+          </div>
+        </div>
+
+        <!-- 3 Competency Breakdown Bars -->
+        <div class="eval-bars-group">
+          <div class="competency-item">
+            <div class="competency-meta"><span>1. Conceptual Recall (Poles &amp; Materials)</span><span id="c1Val">100% (4/4)</span></div>
+            <div class="competency-track"><div class="competency-fill" id="c1Bar" style="width:100%;background:var(--green)"></div></div>
+          </div>
+          <div class="competency-item">
+            <div class="competency-meta"><span>2. Real-World Application (Compass &amp; Earth)</span><span id="c2Val">100% (3/3)</span></div>
+            <div class="competency-track"><div class="competency-fill" id="c2Bar" style="width:100%;background:var(--blue)"></div></div>
+          </div>
+          <div class="competency-item">
+            <div class="competency-meta"><span>3. Critical Analysis (Cutting Magnet &amp; Care)</span><span id="c3Val">33% (1/3)</span></div>
+            <div class="competency-track"><div class="competency-fill" id="c3Bar" style="width:33%;background:var(--red)"></div></div>
+          </div>
+        </div>
+
+        <!-- Diagnostic Gap & Actionable Prescription -->
+        <div class="diagnosis-box" id="evalGapBox">
+          <strong>⚠️ Learning Gap Identified:</strong> Student was confused about cutting a magnet, believing it isolates a single pole (Monopole misconception).
+        </div>
+
+        <div class="prescription-box" id="evalPrescriptionBox">
+          <strong>📋 Actionable Teacher Prescription:</strong> Spend 3 minutes tomorrow on Slide 4's 3D scissors cut simulation to reinforce that poles always exist in pairs.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. TEACHER + AI SYNERGY -->
+  <section class="slide" id="s7">
+    <div class="two">
+      <div>
+        <div class="chapter">The Verdict</div>
+        <h2>Teacher + AI Synergy</h2>
+        <ul class="dots">
+          <li><strong>AI = Power Engine:</strong> Rapid planning, 3D simulations aur instant feedback.</li>
+          <li><strong>Teacher = Heart &amp; Soul:</strong> Empathy, connection, encouragement aur mentoring.</li>
+          <li><strong>Focus Shift:</strong> Admin workload 70% → 10% ghati, mentoring time 3x badhi!</li>
+        </ul>
+        <div class="row" style="margin-top:28px">
+          <button class="btn" id="synergyBtn">🤝 Teacher + AI Jodo</button>
+          <button class="btn ghost" onclick="go(7)">Action Plan ➜</button>
+        </div>
+      </div>
+      <div class="panel" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;position:relative">
+        <div class="duo">
+          <div class="who ai" id="aiWho">
+            <span class="big">🤖</span>
+            AI Engine
+            <ul>
+              <li>Instant Planning</li>
+              <li>3D Visuals</li>
+              <li>Quiz Reports</li>
+            </ul>
+          </div>
+          <div class="beam" id="beamLine"><i></i></div>
+          <div class="who tc" id="tcWho">
+            <span class="big">👩‍🏫</span>
+            Teacher
+            <ul>
+              <li>Empathy &amp; Care</li>
+              <li>Inspiration</li>
+              <li>Life Mentorship</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bar-track" style="width:100%">
+          <span class="lbl" style="width:150px">Routine Admin Load</span>
+          <div class="fill-bg"><div class="fill" id="admBar" style="width:70%;background:var(--red)">70%</div></div>
+        </div>
+        <div class="bar-track" style="width:100%">
+          <span class="lbl" style="width:150px">Student Mentorship</span>
+          <div class="fill-bg"><div class="fill" id="menBar" style="width:30%;background:var(--green)">30%</div></div>
+        </div>
+
+        <div class="hearts-zone" id="heartsZone"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. SUMMARY & ACTION PLAN -->
+  <section class="slide" id="s8">
+    <div style="max-width:920px;margin:0 auto;text-align:center">
+      <div class="chapter">Summary</div>
+      <h2>4 Golden Rules for Every Educator</h2>
+      <p class="sub" style="margin:0 auto 28px;max-width:none">Kal se hi apni classroom teaching mein yeh best practices implement kijiye:</p>
+
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:18px;text-align:left">
+        <div class="panel">
+          <h3 style="color:var(--yellow)">1. Prompt with Context</h3>
+          <p style="font-size:16px;color:var(--muted)">Topic + Grade + 5-min Real World Hook + Fast-learner challenge. 10 second mein structured flow.</p>
+        </div>
+        <div class="panel">
+          <h3 style="color:var(--blue)">2. Visual Delivery</h3>
+          <p style="font-size:16px;color:var(--muted)">Text definitions ratane ke badle screen par 3D interactive model run karein — retention 5x badhta hai.</p>
+        </div>
+        <div class="panel">
+          <h3 style="color:var(--green)">3. Gamified &amp; Diagnostic</h3>
+          <p style="font-size:16px;color:var(--muted)">Bubble shooter games + 10-Q diagnostic assessments se bache ka exact learning gap identify karein.</p>
+        </div>
+        <div class="panel">
+          <h3 style="color:var(--red)">4. Focus on Mentorship</h3>
+          <p style="font-size:16px;color:var(--muted)">Routine paperwork AI sambhalega, teacher ka primary focus bachho ki confidence aur care par hoga.</p>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:center;margin-top:28px">
+        <button class="btn" id="finishBtn">🎉 Thank You! Questions?</button>
+        <button class="btn ghost" onclick="go(0)">⏮ Restart Deck</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div id="nav">
+  <div id="count">1 / 8</div>
+  <div id="dots"></div>
+  <div class="navgroup">
+    <button class="navbtn" id="prevBtn" aria-label="Previous slide">‹</button>
+    <button class="navbtn" id="nextBtn" aria-label="Next slide">›</button>
+  </div>
+</div>
+
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+const $=id=>document.getElementById(id);
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= WEB AUDIO API SOUND SYSTEM ================= */
+let AC=null,soundOn=true,armed=false;
+function initAudio(){
+  if(!AC){
+    AC=new(window.AudioContext||window.webkitAudioContext)();
+  }
+  if(AC.state==='suspended')AC.resume();
+  armed=true;
+}
+['pointerdown','keydown','click'].forEach(ev=>addEventListener(ev,initAudio,{once:true,capture:true}));
+
+function tone(f,d=.15,type='sine',vol=.15,when=0,slide=1){
+  if(!soundOn||!armed)return;
+  try{
+    initAudio();
+    const t=AC.currentTime+when,o=AC.createOscillator(),g=AC.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);
+    if(slide!==1)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*slide),t+d);
+    g.gain.setValueAtTime(vol,t);
+    g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.03);
+  }catch(e){}
+}
+function noise(d=.3,f0=300,f1=2500,vol=.1){
+  if(!soundOn||!armed)return;
+  try{
+    initAudio();
+    const t=AC.currentTime,n=Math.floor(AC.sampleRate*d),b=AC.createBuffer(1,n,AC.sampleRate),dt=b.getChannelData(0);
+    for(let i=0;i<n;i++)dt[i]=Math.random()*2-1;
+    const s=AC.createBufferSource();s.buffer=b;
+    const fl=AC.createBiquadFilter();fl.type='bandpass';fl.Q.value=1.2;
+    fl.frequency.setValueAtTime(f0,t);fl.frequency.exponentialRampToValueAtTime(f1,t+d);
+    const g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    s.connect(fl);fl.connect(g);g.connect(AC.destination);s.start(t);
+  }catch(e){}
+}
+const SFX={
+  click:()=>tone(520,.07,'triangle',.12),
+  pop:()=>tone(320,.14,'sine',.2,0,2.2),
+  whoosh:()=>noise(.3,250,2800,.08),
+  tick:(p=1)=>tone(850*p,.04,'square',.04),
+  type:()=>tone(1150+Math.random()*250,.025,'square',.03),
+  ding:()=>{tone(880,.4,'sine',.15);tone(1320,.5,'sine',.1,.08)},
+  win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.15,i*.09)),
+  fanfare:()=>[523,523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.16,i*.11)),
+  power:()=>tone(220,.45,'sawtooth',.08,0,4.5),
+  sw:()=>{tone(220,.05,'square',.12);tone(140,.08,'square',.1,.05)},
+  note:(i=0)=>tone(392*Math.pow(1.26,i),.3,'triangle',.14),
+  heart:()=>tone(660,.18,'sine',.12,0,1.4)
+};
+function playSfx(n,...a){try{SFX[n](...a)}catch(e){}}
+
+$('sndToggle').onclick=()=>{
+  initAudio();
+  soundOn=!soundOn;
+  $('sndToggle').textContent=soundOn?'🔊 Sound':'🔇 Muted';
+  if(soundOn)playSfx('ding');
+};
+document.addEventListener('click',e=>{
+  if(e.target.closest('button.btn')||e.target.closest('.navbtn')||e.target.closest('.topbtn')){
+    initAudio();playSfx('click');
+  }
+});
+
+/* ================= CONFETTI CANNON ================= */
+const fx=$('fx'),fc=fx.getContext('2d');
+let parts=[],fxRun=false;
+function sizeFx(){fx.width=innerWidth;fx.height=innerHeight}
+addEventListener('resize',sizeFx);sizeFx();
+function boom(x=innerWidth/2,y=innerHeight/2,n=90){
+  if(rm)return;
+  const cols=['#FFD449','#FF4D5A','#3D8BFF','#3ED598','#f783ac','#b197fc','#ff922b'];
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,s=4+Math.random()*8;
+    parts.push({
+      x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-5,g:.24,
+      w:6+Math.random()*6,h:4+Math.random()*6,r:Math.random()*6,
+      vr:(Math.random()-.5)*.35,c:cols[i%cols.length],life:90+Math.random()*50
+    });
+  }
+  if(!fxRun){fxRun=true;requestAnimationFrame(stepFx)}
+}
+function stepFx(){
+  fc.clearRect(0,0,fx.width,fx.height);parts=parts.filter(p=>p.life>0);
+  parts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.99;p.r+=p.vr;p.life--;
+    fc.save();fc.globalAlpha=Math.min(1,p.life/35);fc.translate(p.x,p.y);fc.rotate(p.r);
+    fc.fillStyle=p.c;fc.fillRect(-p.w/2,-p.h/2,p.w,p.h);fc.restore();
+  });
+  if(parts.length)requestAnimationFrame(stepFx);
+  else{fxRun=false;fc.clearRect(0,0,fx.width,fx.height)}
+}
+function boomEl(el,n=50){
+  const r=el.getBoundingClientRect();boom(r.left+r.width/2,r.top+r.height/2,n);
+}
+
+/* ================= BACKGROUND PARTICLES ================= */
+const bg=$('bg'),bc=bg.getContext('2d');let P=[];
+function sizeBg(){
+  bg.width=innerWidth;bg.height=innerHeight;
+  P=Array.from({length:Math.min(50,Math.floor(innerWidth/30))},()=>({
+    x:Math.random()*bg.width,y:Math.random()*bg.height,
+    vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:1+Math.random()*1.8
+  }));
+}
+function drawBg(){
+  bc.clearRect(0,0,bg.width,bg.height);
+  for(const p of P){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>bg.width)p.vx*=-1;
+    if(p.y<0||p.y>bg.height)p.vy*=-1;
+    bc.fillStyle='rgba(169,182,211,0.22)';bc.beginPath();bc.arc(p.x,p.y,p.r,0,7);bc.fill();
+  }
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
+    const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=dx*dx+dy*dy;
+    if(d<11000){
+      bc.strokeStyle='rgba(61,139,255,'+(.18*(1-d/11000))+')';
+      bc.beginPath();bc.moveTo(P[i].x,P[i].y);bc.lineTo(P[j].x,P[j].y);bc.stroke();
+    }
+  }
+  if(!rm)requestAnimationFrame(drawBg);
+}
+addEventListener('resize',sizeBg);sizeBg();drawBg();
+
+/* ================= DECK NAVIGATION ================= */
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const dots=$('dots');
+slides.forEach((_,i)=>{
+  const d=document.createElement('span');
+  d.onclick=()=>go(i);
+  dots.appendChild(d);
+});
+
+function go(n,silent){
+  const old=cur;cur=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>{
+    s.classList.toggle('active',i===cur);
+    s.classList.toggle('prev',i<cur);
+  });
+  [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===cur));
+  $('count').textContent=(cur+1)+' / '+slides.length;
+  $('prog').style.width=((cur+1)/slides.length*100)+'%';
+
+  if(!silent&&old!==cur){
+    playSfx('whoosh');
+    if(cur===slides.length-1){
+      setTimeout(()=>{boom(innerWidth/2,innerHeight/3,120);playSfx('fanfare');},350);
+    }
+  }
+  if(cur===3&&stage3D){stage3D.resize();}
+}
+
+$('prevBtn').onclick=()=>go(cur-1);
+$('nextBtn').onclick=()=>go(cur+1);
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+$('fsToggle').onclick=toggleFS;
+
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1);}
+  else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur-1);}
+  else if(e.key.toLowerCase()==='f')toggleFS();
+});
+let tx=null;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+document.addEventListener('touchend',e=>{
+  if(tx===null)return;
+  const d=e.changedTouches[0].clientX-tx;
+  if(Math.abs(d)>60)go(cur+(d<0?1:-1));
+  tx=null;
+});
+
+/* ================= SLIDE 1: AVATAR & PRESENTER PHOTO ================= */
+const greetings=[
+  'जय जोहार, जय छत्तीसगढ़! 🙏🌾',
+  'Namaste! Tarun Kaushik here 🚀',
+  'AI teacher ka sabse loyal co-pilot hai ✈️',
+  'Padhai ab hogi 10x visual aur fun! 💡',
+  'Welcome teachers to AI Pedagogy! ✨'
+];
+let greetIdx=0,bTimer=null;
+
+function applyTeacherPhoto(url){
+  if(!url||!url.trim())return;
+  const cleanUrl=url.trim();
+  const img=$('teacherPhoto');
+  const thumb=$('presenterThumb');
+  if(img){img.src=cleanUrl;img.style.display='block';}
+  if(thumb){thumb.src=cleanUrl;thumb.style.display='block';}
+  const fb=$('avatarFallback');if(fb)fb.style.display='none';
+  const tbFb=$('presenterThumbFallback');if(tbFb)tbFb.style.display='none';
+  try{localStorage.setItem('tarun_teacher_photo',cleanUrl);}catch(e){}
+}
+
+// Default teacher photo
+const DEFAULT_TEACHER_PHOTO = 'https://i.ibb.co/gbM1ZmZZ/Professional-Portrait-in-Plaid-Shirt.png';
+
+// Load saved photo if exists, otherwise apply default
+try{
+  const savedPhoto = localStorage.getItem('tarun_teacher_photo');
+  const activeUrl = (savedPhoto && savedPhoto.trim()) ? savedPhoto.trim() : DEFAULT_TEACHER_PHOTO;
+  if($('photoUrlInput')) $('photoUrlInput').value = activeUrl;
+  applyTeacherPhoto(activeUrl);
+}catch(e){
+  applyTeacherPhoto(DEFAULT_TEACHER_PHOTO);
+}
+
+if($('setPhotoBtn')){
+  $('setPhotoBtn').onclick=()=>{
+    const val=$('photoUrlInput').value;
+    if(val){
+      applyTeacherPhoto(val);
+      playSfx('win');
+      boomEl($('avatarCore'),45);
+    }
+  };
+}
+if($('photoUrlInput')){
+  $('photoUrlInput').addEventListener('keydown',e=>{
+    if(e.key==='Enter')$('setPhotoBtn').click();
+  });
+}
+
+$('waveBtn').onclick=()=>{
+  const s=$('avatarCore');s.classList.remove('wave');void s.offsetWidth;s.classList.add('wave');
+  const b=$('speechBubble');b.textContent=greetings[greetIdx++%greetings.length];b.classList.add('on');
+  clearTimeout(bTimer);bTimer=setTimeout(()=>b.classList.remove('on'),2800);
+  playSfx('pop');playSfx('ding');boomEl(s,45);
+};
+$('avatarCore').onclick=()=>$('waveBtn').click();
+
+/* ================= SLIDE 2: 3 PILLARS FLOW ================= */
+let flowTimers=[];
+function resetFlow(){
+  flowTimers.forEach(clearTimeout);flowTimers=[];
+  document.querySelectorAll('#flowGrid .flow-card,#flowGrid .flow-arr').forEach(el=>el.classList.remove('lit'));
+  $('flowTrack').style.transition='none';$('flowTrack').style.width='0';
+}
+$('runFlowBtn').onclick=()=>{
+  resetFlow();void $('flowTrack').offsetWidth;
+  $('flowTrack').style.transition='width 2.4s linear';$('flowTrack').style.width='100%';
+  const items=[...document.querySelectorAll('#flowGrid > *')];
+  items.forEach((el,i)=>flowTimers.push(setTimeout(()=>{
+    el.classList.add('lit');
+    if(el.classList.contains('flow-card'))playSfx('note',i/2*2.2|0);
+    else playSfx('tick',1.5);
+  },i*500)));
+  flowTimers.push(setTimeout(()=>{
+    playSfx('win');boomEl($('flowTrack'),65);
+  },items.length*500+100));
+};
+$('resetFlowBtn').onclick=resetFlow;
+
+/* ================= SLIDE 3: PILLAR 1 PLANNING ================= */
+const LESSON_PROMPT="Grade 6 Science: 'Exploring Magnets' ka 45-min lively period plan do — hook, concept, activity aur wrap-up ke sath.";
+const tlBlocks=[...document.querySelectorAll('#timelineBar .timeline-block')];
+const tlSpans=[[0,5],[5,20],[20,35],[35,45]];
+const scrubberFill=$('scrubberFill');
+const phasePill=$('phasePill');
+const phaseMsg=$('phaseMsg');
+let genTimer=null,runTimer=null;
+
+function selectPhase(idx){
+  tlBlocks.forEach((b,i)=>b.classList.toggle('sel',i===idx));
+  const b=tlBlocks[idx];
+  if(b){
+    phasePill.textContent=b.dataset.pill;
+    if($('phaseGoal'))$('phaseGoal').textContent=b.dataset.goal;
+    phaseMsg.textContent=b.dataset.t;
+    if($('phaseInsight'))$('phaseInsight').textContent=b.dataset.sub;
+    const percs=[12,44,78,100];
+    if(scrubberFill)scrubberFill.style.width=percs[idx]+'%';
+  }
+}
+
+tlBlocks.forEach((d,idx)=>{
+  d.onclick=()=>{
+    selectPhase(idx);
+    playSfx('pop');
+  };
+});
+
+$('genPlanBtn').onclick=()=>{
+  clearInterval(genTimer);clearInterval(runTimer);
+  tlBlocks.forEach(b=>b.classList.remove('sel'));
+  if(scrubberFill)scrubberFill.style.width='0%';
+  phasePill.textContent='🤖 AI Generating';
+  if($('phaseGoal'))$('phaseGoal').textContent='⚡ Optimizing 45-Min Allocation';
+  phaseMsg.textContent='AI 45-min balanced lesson blueprint structure bana raha hai…';
+  if($('phaseInsight'))$('phaseInsight').textContent='⏳ Calculating attention curves & active discovery time...';
+  $('periodClock').textContent='⏱ 0 / 45 min';
+  let i=0;$('promptText').textContent='';
+  genTimer=setInterval(()=>{
+    $('promptText').textContent=LESSON_PROMPT.slice(0,++i);
+    if(i%3===0)playSfx('type');
+    if(i>=LESSON_PROMPT.length){
+      clearInterval(genTimer);playSfx('power');
+      tlBlocks.forEach((b,k)=>setTimeout(()=>{
+        playSfx('note',k);
+      },k*280+120));
+      setTimeout(()=>{
+        selectPhase(0);
+        playSfx('ding');boomEl($('timelineBar'),50);
+      },tlBlocks.length*280+350);
+    }
+  },22);
+};
+
+$('playPeriodBtn').onclick=()=>{
+  clearInterval(genTimer);clearInterval(runTimer);
+  let min=0;
+  if(scrubberFill)scrubberFill.style.width='0%';
+  runTimer=setInterval(()=>{
+    min+=.5;
+    if(scrubberFill)scrubberFill.style.width=(min/45*100)+'%';
+    $('periodClock').textContent='⏱ '+Math.floor(min)+' / 45 min';
+    const activeIdx=tlSpans.findIndex(s=>min>=s[0]&&min<s[1]);
+    if(activeIdx>=0){
+      tlBlocks.forEach((b,j)=>b.classList.toggle('sel',j===activeIdx));
+      if(tlSpans[activeIdx][0]===min&&min>0){
+        playSfx('note',activeIdx);
+        phasePill.textContent=tlBlocks[activeIdx].dataset.pill;
+        if($('phaseGoal'))$('phaseGoal').textContent=tlBlocks[activeIdx].dataset.goal;
+        phaseMsg.textContent=tlBlocks[activeIdx].dataset.t;
+        if($('phaseInsight'))$('phaseInsight').textContent=tlBlocks[activeIdx].dataset.sub;
+      }
+    }
+    if(min>=45){
+      clearInterval(runTimer);
+      selectPhase(3);
+      playSfx('win');$('periodClock').textContent='⏱ 45-Min Class Complete! 🎉';
+      boomEl($('periodClock'),60);
+    }
+  },55);
+};
+
+$('btnBasic').onclick=()=>{
+  $('btnBasic').classList.add('on');
+  $('btnAdv').classList.remove('on');
+  $('trackCard').innerHTML=`<div><strong style="color:var(--green)">🌱 Foundation Strategy (Basic Learners):</strong> Real-life analogy — 'Jaise cello-tape paper ko pakadti hai, magnet iron ko chipkata hai — lakdi ya plastic ko nahi.'</div><div class="track-detail-tip">💡 Concrete Scaffolding: Abstract formula batane se pehle concrete physical object touch karwayein.</div>`;
+  playSfx('pop');
+};
+$('btnAdv').onclick=()=>{
+  $('btnAdv').classList.add('on');
+  $('btnBasic').classList.remove('on');
+  $('trackCard').innerHTML=`<div><strong style="color:var(--blue)">🚀 Extension Challenge (Fast Learners - HOTS):</strong> Inquiry Question — 'Agar hum magnet ko hammer se peetein ya mombatti par garam karein, toh kya iski magnetic power khatam hogi? Kyun?'</div><div class="track-detail-tip">💡 Higher-Order Thinking: Inhe 'Earth as a Magnet' aur 'Maglev Train' ka exploration task dein taaki focus bana rahe.</div>`;
+  playSfx('pop');
+};
+
+/* ================= SLIDE 4: THREE.JS 3D TYPES OF MAGNETS ================= */
+let stage3D=null;
+const has3D=typeof THREE!=='undefined';
+
+if(has3D){
+  const MAT={
+    red:()=>new THREE.MeshStandardMaterial({color:0xff4d5a,roughness:.45,metalness:.15}),
+    blue:()=>new THREE.MeshStandardMaterial({color:0x3d8bff,roughness:.45,metalness:.15}),
+    iron:()=>new THREE.MeshStandardMaterial({color:0x8a94a8,roughness:.35,metalness:.7}),
+    filing:()=>new THREE.MeshStandardMaterial({color:0x3a4356,roughness:.5,metalness:.8}),
+    copper:()=>new THREE.MeshStandardMaterial({color:0xc47a3a,roughness:.3,metalness:.8,emissive:0x000000}),
+  };
+
+  function label3D(text,size=.5){
+    const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+    g.font='bold 94px Fredoka, Arial';g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';
+    g.shadowColor='rgba(0,0,0,.6)';g.shadowBlur=8;g.fillText(text,64,66);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));
+    sp.scale.set(size,size,1);return sp;
+  }
+
+  function barMagnet(len=2.6,h=.6){
+    const g=new THREE.Group();
+    const n=new THREE.Mesh(new THREE.BoxGeometry(len/2,h,h),MAT.red());n.position.x=len/4;
+    const s=new THREE.Mesh(new THREE.BoxGeometry(len/2,h,h),MAT.blue());s.position.x=-len/4;
+    const ln=label3D('N');ln.position.x=len/2+.3;const ls=label3D('S');ls.position.x=-len/2-.3;
+    g.add(n,s,ln,ls);g.userData.poles=[new THREE.Vector3(len/2,0,0),new THREE.Vector3(-len/2,0,0)];
+    return g;
+  }
+
+  function horseshoe(){
+    const g=new THREE.Group();
+    const arc=new THREE.Mesh(new THREE.TorusGeometry(1,.3,18,48,Math.PI),MAT.iron());g.add(arc);
+    const legN=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.6),MAT.red());legN.position.set(1,-.5,0);
+    const legS=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.6),MAT.blue());legS.position.set(-1,-.5,0);
+    const ln=label3D('N');ln.position.set(1,-1.35,0);const ls=label3D('S');ls.position.set(-1,-1.35,0);
+    g.add(legN,legS,ln,ls);g.position.y=.4;
+    g.userData.poles=[new THREE.Vector3(1,-1,0),new THREE.Vector3(-1,-1,0)];
+    return g;
+  }
+
+  function cylinderMagnet(){
+    const g=new THREE.Group();
+    const n=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,1.3,40),MAT.red());n.position.y=.65;
+    const s=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,1.3,40),MAT.blue());s.position.y=-.65;
+    const ln=label3D('N');ln.position.y=1.6;const ls=label3D('S');ls.position.y=-1.6;
+    g.add(n,s,ln,ls);g.rotation.z=Math.PI/2;g.rotation.x=.3;
+    g.userData.poles=[new THREE.Vector3(1.3,0,0),new THREE.Vector3(-1.3,0,0)];
+    return g;
+  }
+
+  function ringMagnet(){
+    const g=new THREE.Group();
+    const shape=new THREE.Shape();shape.absarc(0,0,1.1,0,Math.PI*2,false);
+    const hole=new THREE.Path();hole.absarc(0,0,.45,0,Math.PI*2,true);shape.holes.push(hole);
+    const body=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth:.35,bevelEnabled:false}),MAT.iron());body.position.z=-.175;
+    const top=new THREE.Mesh(new THREE.RingGeometry(.45,1.1,48),MAT.red());top.position.z=.18;
+    const bot=new THREE.Mesh(new THREE.RingGeometry(.45,1.1,48),MAT.blue());bot.position.z=-.18;bot.rotation.y=Math.PI;
+    const ln=label3D('N',.45);ln.position.set(0,0,.5);const ls=label3D('S',.45);ls.position.set(0,0,-.5);
+    g.add(body,top,bot,ln,ls);g.rotation.x=-.9;
+    g.userData.poles=[new THREE.Vector3(0,0,.3),new THREE.Vector3(0,0,-.3)];
+    return g;
+  }
+
+  function buttonMagnet(){
+    const g=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.75,.75,.3,48),MAT.iron());
+    const top=new THREE.Mesh(new THREE.CircleGeometry(.75,48),MAT.red());top.rotation.x=-Math.PI/2;top.position.y=.151;
+    const bot=new THREE.Mesh(new THREE.CircleGeometry(.75,48),MAT.blue());bot.rotation.x=Math.PI/2;bot.position.y=-.151;
+    const ln=label3D('N',.45);ln.position.y=.5;const ls=label3D('S',.45);ls.position.y=-.5;
+    g.add(body,top,bot,ln,ls);g.rotation.x=.5;
+    g.userData.poles=[new THREE.Vector3(0,.2,0),new THREE.Vector3(0,-.2,0)];
+    return g;
+  }
+
+  function electromagnet(){
+    const g=new THREE.Group();
+    const core=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,2.6,32),MAT.iron());core.rotation.z=Math.PI/2;g.add(core);
+    const coilMat=MAT.copper();g.userData.coilMat=coilMat;
+    for(let i=0;i<14;i++){
+      const t=new THREE.Mesh(new THREE.TorusGeometry(.38,.06,10,32),coilMat);
+      t.rotation.y=Math.PI/2;t.position.x=-.9+i*.14;g.add(t);
+    }
+    const bat=new THREE.Mesh(new THREE.BoxGeometry(.9,.4,.4),new THREE.MeshStandardMaterial({color:0x2b2f3a,roughness:.6}));bat.position.set(0,-1.5,0);
+    const cap=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.12,16),MAT.iron());cap.rotation.z=Math.PI/2;cap.position.set(.5,-1.5,0);
+    const pts=[new THREE.Vector3(-.9,-.1,0),new THREE.Vector3(-1.4,-.1,0),new THREE.Vector3(-1.4,-1.5,0),new THREE.Vector3(-.45,-1.5,0)];
+    const pts2=[new THREE.Vector3(.92,-.1,0),new THREE.Vector3(1.4,-.1,0),new THREE.Vector3(1.4,-1.5,0),new THREE.Vector3(.56,-1.5,0)];
+    const wireMat=new THREE.LineBasicMaterial({color:0xc47a3a});
+    g.add(bat,cap,new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),wireMat),new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),wireMat));
+    g.position.y=.5;
+    g.userData.poles=[new THREE.Vector3(1.3,0,0),new THREE.Vector3(-1.3,0,0)];
+    return g;
+  }
+
+  function makeFilings(poles,count=90,spread=.35){
+    const grp=new THREE.Group();const geo=new THREE.BoxGeometry(.035,.035,.2);const mat=MAT.filing();
+    for(let i=0;i<count;i++){
+      const p=poles[i%poles.length];const m=new THREE.Mesh(geo,mat);
+      const dir=new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize();
+      const target=p.clone().add(dir.multiplyScalar(.18+Math.random()*spread));
+      m.position.copy(target);m.lookAt(p);
+      grp.add(m);
+    }
+    return grp;
+  }
+
+  function StageController(canvas){
+    this.canvas=canvas;this.scene=new THREE.Scene();
+    this.camera=new THREE.PerspectiveCamera(38,1,.1,100);this.camera.position.set(0,1.3,6.2);this.camera.lookAt(0,0,0);
+    this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    this.scene.add(new THREE.AmbientLight(0xffffff,.58));
+    const d1=new THREE.DirectionalLight(0xffffff,.9);d1.position.set(3,5,4);
+    const d2=new THREE.DirectionalLight(0x9fc3ff,.35);d2.position.set(-4,2,-3);
+    this.scene.add(d1,d2);
+    this.root=new THREE.Group();this.scene.add(this.root);
+    this.rx=.2;this.ry=0;this.drag=false;this.auto=true;let lx,ly;
+
+    canvas.addEventListener('pointerdown',e=>{this.drag=true;this.auto=false;lx=e.clientX;ly=e.clientY;canvas.setPointerCapture(e.pointerId);});
+    canvas.addEventListener('pointermove',e=>{
+      if(!this.drag)return;
+      this.ry+=(e.clientX-lx)*.01;
+      this.rx=Math.max(-1.2,Math.min(1.2,this.rx+(e.clientY-ly)*.01));
+      lx=e.clientX;ly=e.clientY;
+    });
+    canvas.addEventListener('pointerup',()=>{this.drag=false;setTimeout(()=>this.auto=true,2500);});
+    this.resize();
+    new ResizeObserver(()=>this.resize()).observe(canvas.parentElement);
+  }
+  StageController.prototype.resize=function(){
+    const w=this.canvas.parentElement.clientWidth,h=this.canvas.parentElement.clientHeight;
+    if(!w||!h)return;
+    this.renderer.setSize(w,h,false);
+    this.camera.aspect=w/h;this.camera.updateProjectionMatrix();
+  };
+  StageController.prototype.render=function(dt){
+    if(this.auto&&!this.drag)this.ry+=dt*.35;
+    this.root.rotation.set(this.rx,this.ry,0);
+    this.renderer.render(this.scene,this.camera);
+  };
+
+  stage3D=new StageController($('c4'));
+  const builders={bar:barMagnet,horseshoe:horseshoe,cylinder:cylinderMagnet,ring:ringMagnet,button:buttonMagnet,electro:electromagnet};
+  const descs={
+    bar:['Bar magnet','A straight magnet shaped like a rectangular block (cuboid). The most common magnet in your science lab. Notice iron filings crowd at the two ends (poles).'],
+    horseshoe:['U-shaped / Horseshoe magnet','Bent like the letter U or a horse\'s shoe. Both poles are close together, so it grips iron objects with strong magnetic force.'],
+    cylinder:['Cylindrical magnet','A solid cylinder – like a small rod – with North pole at one end and South pole at the other. Used in motors and speakers.'],
+    ring:['Ring magnet','Circular with a hole in the centre. One flat face is N, the other is S. Commonly found inside loudspeakers.'],
+    button:['Button magnet','A small, flat disc or capsule-like magnet. Widely used in pencil-box catches and fridge magnets.'],
+    electro:['Electromagnet (Temporary Magnet ⚡)','Insulated copper wire wound around an iron core. It becomes a magnet only while electric current flows! Switch the current ON to see it attract iron filings.']
+  };
+
+  let model=null,eFilings=null,currentOn=false;
+  const currentBtn=$('currentBtn');
+
+  function showType(t){
+    if(model)stage3D.root.remove(model);
+    if(eFilings){stage3D.root.remove(eFilings);eFilings=null;}
+    model=builders[t]();stage3D.root.add(model);
+    const d=descs[t];$('typeDesc').innerHTML='<h3>'+d[0]+'</h3><p>'+d[1]+'</p>';
+
+    if(t==='electro'){
+      currentOn=false;currentBtn.style.display='';currentBtn.textContent='Switch current ON';
+    }else{
+      currentBtn.style.display='none';
+      const f=makeFilings(model.userData.poles,90,.35);
+      model.add(f);
+    }
+    document.querySelectorAll('#typebar button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+    playSfx('pop');
+  }
+
+  $('typebar').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(b)showType(b.dataset.t);
+  });
+
+  currentBtn.onclick=()=>{
+    currentOn=!currentOn;
+    currentBtn.textContent=currentOn?'Switch current OFF':'Switch current ON';
+    model.userData.coilMat.emissive.setHex(currentOn?0x7a3b00:0x000000);
+    playSfx('sw');
+    if(currentOn){
+      playSfx('power');
+      eFilings=makeFilings(model.userData.poles,140,.4);
+      model.add(eFilings);
+      setTimeout(()=>playSfx('ding'),250);
+      boomEl(currentBtn,40);
+    }else if(eFilings){
+      model.remove(eFilings);eFilings=null;
+    }
+  };
+
+  $('reset3dBtn').onclick=()=>{
+    stage3D.rx=.2;stage3D.ry=0;playSfx('click');
+  };
+
+  showType('bar');
+
+  let lastT=performance.now();
+  (function loop(t){
+    requestAnimationFrame(loop);
+    const dt=Math.min(.05,(t-lastT)/1000);lastT=t;
+    if(cur===3&&stage3D)stage3D.render(dt);
+  })(lastT);
+}else{
+  $('c4').parentElement.innerHTML='<div style="padding:30px;color:var(--muted)">3D view needs an internet connection to load Three.js.</div>';
+}
+
+/* ================= SLIDE 5: PILLAR 3A BUBBLE SHOOTER TARGET SUM ================= */
+const bubbleGrid = $('bubbleGrid');
+const targetSumDisplay = $('targetSumDisplay');
+const hintTarget = $('hintTarget');
+const bubbleScoreEl = $('bubbleScore');
+const bubbleStreakEl = $('bubbleStreak');
+const bubbleFeedback = $('bubbleFeedback');
+
+let bubbleScore = 0;
+let bubbleStreak = 0;
+let targetSum = 10;
+let selectedBubble = null;
+let bubbleValues = [];
+
+const TARGET_POOL = [8, 9, 10, 11, 12, 13, 14, 15];
+const BUBBLE_COLORS = ['#3D8BFF', '#3ED598', '#FFD449', '#FF4D5A', '#b197fc', '#ff922b'];
+
+function generateBubblesForTarget(target) {
+  const pairs = [];
+  const p1_a = Math.floor(Math.random() * (target - 2)) + 1;
+  const p1_b = target - p1_a;
+  pairs.push(p1_a, p1_b);
+
+  const p2_a = Math.floor(Math.random() * (target - 2)) + 1;
+  const p2_b = target - p2_a;
+  pairs.push(p2_a, p2_b);
+
+  const vals = [...pairs];
+  while (vals.length < 12) {
+    vals.push(Math.floor(Math.random() * 9) + 1);
+  }
+  for (let i = vals.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [vals[i], vals[j]] = [vals[j], vals[i]];
+  }
+  return vals;
+}
+
+function initBubbleGame(newTgt = 10) {
+  targetSum = newTgt;
+  targetSumDisplay.textContent = targetSum;
+  hintTarget.textContent = targetSum;
+  selectedBubble = null;
+  bubbleFeedback.className = 'bubble-feedback';
+  bubbleFeedback.innerHTML = `👆 Pop any 2 bubbles whose sum equals <span id="hintTarget">${targetSum}</span>!`;
+
+  bubbleValues = generateBubblesForTarget(targetSum);
+  renderBubbles();
+}
+
+function renderBubbles() {
+  bubbleGrid.innerHTML = '';
+  bubbleValues.forEach((val, idx) => {
+    const btn = document.createElement('div');
+    btn.className = 'bubble-btn';
+    btn.textContent = val;
+    btn.dataset.val = val;
+    btn.dataset.idx = idx;
+    const col = BUBBLE_COLORS[idx % BUBBLE_COLORS.length];
+    btn.style.setProperty('--c', col);
+    btn.style.setProperty('--del', (idx * 0.18) + 's');
+
+    btn.onclick = () => onBubbleClick(btn, val, idx);
+    bubbleGrid.appendChild(btn);
+  });
+}
+
+function onBubbleClick(btn, val, idx) {
+  if (btn.classList.contains('popping')) return;
+
+  if (!selectedBubble) {
+    selectedBubble = { btn, val, idx };
+    btn.classList.add('sel');
+    playSfx('pop');
+    const needed = targetSum - val;
+    bubbleFeedback.className = 'bubble-feedback';
+    bubbleFeedback.textContent = `Selected ${val}. Now pop a bubble with ${needed > 0 ? needed : '?'} to make ${targetSum}!`;
+  } else if (selectedBubble.idx === idx) {
+    btn.classList.remove('sel');
+    selectedBubble = null;
+    playSfx('tick');
+    bubbleFeedback.textContent = `Deselected. Pop any 2 bubbles whose sum equals ${targetSum}!`;
+  } else {
+    const v1 = selectedBubble.val;
+    const b1 = selectedBubble.btn;
+    const v2 = val;
+    const b2 = btn;
+    const sum = v1 + v2;
+
+    if (sum === targetSum) {
+      b1.classList.remove('sel');
+      b1.classList.add('popping');
+      b2.classList.add('popping');
+
+      playSfx('ding');
+      playSfx('win');
+      boomEl(b2, 35);
+
+      bubbleScore += 100 * (bubbleStreak + 1);
+      bubbleStreak += 1;
+      bubbleScoreEl.textContent = bubbleScore;
+      bubbleStreakEl.textContent = bubbleStreak + 'x';
+
+      bubbleFeedback.className = 'bubble-feedback ok';
+      bubbleFeedback.textContent = `🎉 Fantastic! ${v1} + ${v2} = ${targetSum}! (+${100 * bubbleStreak} pts)`;
+
+      selectedBubble = null;
+
+      setTimeout(() => {
+        const nextT = TARGET_POOL[Math.floor(Math.random() * TARGET_POOL.length)];
+        initBubbleGame(nextT);
+      }, 700);
+    } else {
+      b1.classList.remove('sel');
+      b1.classList.add('shake-err');
+      b2.classList.add('shake-err');
+      playSfx('wrong');
+
+      bubbleStreak = 0;
+      bubbleStreakEl.textContent = '0x';
+
+      bubbleFeedback.className = 'bubble-feedback bad';
+      bubbleFeedback.textContent = `❌ ${v1} + ${v2} = ${sum} (Target was ${targetSum}). Try again!`;
+
+      setTimeout(() => {
+        b1.classList.remove('shake-err');
+        b2.classList.remove('shake-err');
+        selectedBubble = null;
+      }, 500);
+    }
+  }
+}
+
+$('newTargetBtn').onclick = () => {
+  const currentIdx = TARGET_POOL.indexOf(targetSum);
+  const nextT = TARGET_POOL[(currentIdx + 1) % TARGET_POOL.length];
+  initBubbleGame(nextT);
+  playSfx('click');
+};
+
+$('resetBubbleBtn').onclick = () => {
+  bubbleScore = 0;
+  bubbleStreak = 0;
+  bubbleScoreEl.textContent = '0';
+  bubbleStreakEl.textContent = '0x';
+  initBubbleGame(10);
+  playSfx('pop');
+};
+
+initBubbleGame(10);
+
+/* ================= SLIDE 6: PILLAR 3B 10-QUESTION DIAGNOSTIC ASSESSMENT & REPORT ================= */
+const DIAG_QUESTIONS = [
+  {
+    q: "1. A bar magnet always has how many magnetic poles?",
+    opts: ["One pole", "Two poles (North & South)", "Three poles", "Zero poles"],
+    ans: 1,
+    cat: 1,
+    exp: "Every magnet always has exactly two poles: North (N) and South (S)."
+  },
+  {
+    q: "2. When two North poles are brought close to each other, they will...",
+    opts: ["Attract each other", "Repel each other", "Rotate continuously", "Do nothing"],
+    ans: 1,
+    cat: 1,
+    exp: "Like poles (N-N or S-S) always repel each other. Unlike poles attract."
+  },
+  {
+    q: "3. Which of the following is a magnetic material?",
+    opts: ["Wooden ruler", "Plastic spoon", "Iron nail", "Glass marble"],
+    ans: 2,
+    cat: 1,
+    exp: "Iron, nickel, cobalt, and steel are magnetic materials attracted by magnets."
+  },
+  {
+    q: "4. When a bar magnet is rolled in iron filings, where do most filings stick?",
+    opts: ["Only in the middle", "At both ends (poles)", "Evenly everywhere", "Filings do not stick"],
+    ans: 1,
+    cat: 1,
+    exp: "Magnetic attraction is strongest at the poles (ends) of the magnet."
+  },
+  {
+    q: "5. A freely suspended bar magnet always rests in which direction?",
+    opts: ["East – West", "North – South", "Up – Down", "Any random angle"],
+    ans: 1,
+    cat: 2,
+    exp: "Because Earth behaves like a giant bar magnet, freely suspended magnets align North-South."
+  },
+  {
+    q: "6. A magnetic compass works because...",
+    opts: ["Air currents push it", "Earth acts like a giant magnet", "Sunlight attracts it", "Gravity pulls it"],
+    ans: 1,
+    cat: 2,
+    exp: "Earth's magnetic field directs the compass needle to point towards magnetic North."
+  },
+  {
+    q: "7. Magnetism can pass through which of the following non-magnetic materials?",
+    opts: ["Paper and cardboard sheet", "Heavy lead sheet only", "Nothing can allow it", "Only molten iron"],
+    ans: 0,
+    cat: 2,
+    exp: "Magnetic force acts through non-magnetic barriers like paper, thin wood, and cardboard."
+  },
+  {
+    q: "8. If you cut a bar magnet in half through the middle, what happens?",
+    opts: ["One piece is only North, one only South", "Each piece becomes a complete magnet with N and S", "It completely loses all magnetism", "Both pieces become South"],
+    ans: 1,
+    cat: 3,
+    exp: "Isolated magnetic poles do not exist! Each cut piece automatically develops both N and S poles."
+  },
+  {
+    q: "9. An electromagnet behaves as a magnet only when...",
+    opts: ["It is kept in cold water", "Electric current flows through its coil", "It is hammered", "It is heated"],
+    ans: 1,
+    cat: 3,
+    exp: "An electromagnet is a temporary magnet powered by the flow of electric current."
+  },
+  {
+    q: "10. A permanent magnet will lose its magnetism if a student...",
+    opts: ["Stores it between soft iron keepers", "Heats it over flame or hammers it repeatedly", "Keeps it in wooden box", "Uses it to pick paper clips"],
+    ans: 1,
+    cat: 3,
+    exp: "Heating, dropping, or hammering disaligns magnetic domains, causing demagnetization."
+  }
+];
+
+let diagCurrentQ = 0;
+let diagUserAnswers = new Array(10).fill(null);
+
+const diagCounter = $('diagCounter');
+const diagProgressFill = $('diagProgressFill');
+const diagQText = $('diagQText');
+const diagOptsGrid = $('diagOptsGrid');
+const diagExplain = $('diagExplain');
+const diagNextBtn = $('diagNextBtn');
+
+function loadDiagQuestion(idx) {
+  diagCurrentQ = idx;
+  const qObj = DIAG_QUESTIONS[idx];
+  diagCounter.textContent = `Q ${idx + 1} / 10`;
+  diagProgressFill.style.width = `${((idx + 1) / 10) * 100}%`;
+  diagQText.textContent = qObj.q;
+
+  diagOptsGrid.innerHTML = '';
+  diagExplain.textContent = '💡 Select the correct answer to see instant feedback and explanation.';
+  diagNextBtn.style.display = 'none';
+
+  qObj.opts.forEach((optText, oIdx) => {
+    const btn = document.createElement('button');
+    btn.className = 'diag-opt';
+    btn.innerHTML = `<span style="opacity:0.6;font-family:ui-monospace">[${String.fromCharCode(65 + oIdx)}]</span> ${optText}`;
+
+    if (diagUserAnswers[idx] !== null) {
+      btn.disabled = true;
+      if (oIdx === qObj.ans) btn.classList.add('correct');
+      if (diagUserAnswers[idx] === oIdx && oIdx !== qObj.ans) btn.classList.add('wrong');
+    } else {
+      btn.onclick = () => onSelectDiagOption(oIdx);
+    }
+    diagOptsGrid.appendChild(btn);
+  });
+
+  if (diagUserAnswers[idx] !== null) {
+    diagExplain.textContent = `💡 ${qObj.exp}`;
+    if (idx < 9) diagNextBtn.style.display = 'inline-flex';
+  }
+}
+
+function onSelectDiagOption(oIdx) {
+  const qObj = DIAG_QUESTIONS[diagCurrentQ];
+  diagUserAnswers[diagCurrentQ] = oIdx;
+
+  const isCorrect = oIdx === qObj.ans;
+  const optBtns = diagOptsGrid.querySelectorAll('.diag-opt');
+
+  optBtns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === qObj.ans) btn.classList.add('correct');
+    if (i === oIdx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  if (isCorrect) {
+    playSfx('ding');
+  } else {
+    playSfx('wrong');
+  }
+
+  diagExplain.textContent = `💡 ${qObj.exp}`;
+  updateEvaluationReport();
+
+  if (diagCurrentQ < 9) {
+    diagNextBtn.style.display = 'inline-flex';
+  } else {
+    diagNextBtn.style.display = 'none';
+    playSfx('fanfare');
+    boomEl($('evalCard'), 70);
+  }
+}
+
+diagNextBtn.onclick = () => {
+  if (diagCurrentQ < 9) {
+    loadDiagQuestion(diagCurrentQ + 1);
+    playSfx('click');
+  }
+};
+
+function updateEvaluationReport() {
+  let score = 0;
+  let catScores = { 1: { correct: 0, total: 4 }, 2: { correct: 0, total: 3 }, 3: { correct: 0, total: 3 } };
+
+  diagUserAnswers.forEach((ans, i) => {
+    if (ans !== null) {
+      const qObj = DIAG_QUESTIONS[i];
+      if (ans === qObj.ans) {
+        score++;
+        catScores[qObj.cat].correct++;
+      }
+    }
+  });
+
+  $('evalScoreDisplay').textContent = `${score} / 10`;
+
+  const p1 = Math.round((catScores[1].correct / catScores[1].total) * 100);
+  const p2 = Math.round((catScores[2].correct / catScores[2].total) * 100);
+  const p3 = Math.round((catScores[3].correct / catScores[3].total) * 100);
+
+  $('c1Val').textContent = `${p1}% (${catScores[1].correct}/${catScores[1].total})`;
+  $('c1Bar').style.width = `${p1}%`;
+
+  $('c2Val').textContent = `${p2}% (${catScores[2].correct}/${catScores[2].total})`;
+  $('c2Bar').style.width = `${p2}%`;
+
+  $('c3Val').textContent = `${p3}% (${catScores[3].correct}/${catScores[3].total})`;
+  $('c3Bar').style.width = `${p3}%`;
+
+  const tierEl = $('evalMasteryTier');
+  if (score >= 9) {
+    tierEl.textContent = 'Level: Mastery (90%+)';
+    tierEl.style.color = 'var(--green)';
+  } else if (score >= 7) {
+    tierEl.textContent = 'Level: Proficient (70-89%)';
+    tierEl.style.color = 'var(--green)';
+  } else if (score >= 5) {
+    tierEl.textContent = 'Level: Developing (50-69%)';
+    tierEl.style.color = 'var(--yellow)';
+  } else {
+    tierEl.textContent = 'Level: Needs Support (<50%)';
+    tierEl.style.color = 'var(--red)';
+  }
+}
+
+$('autoSimulateBtn').onclick = () => {
+  diagUserAnswers = [1, 1, 2, 1, 1, 1, 0, 0, 1, 0];
+  loadDiagQuestion(9);
+  updateEvaluationReport();
+  playSfx('win');
+  boomEl($('evalCard'), 60);
+};
+
+$('resetDiagBtn').onclick = () => {
+  diagUserAnswers = new Array(10).fill(null);
+  loadDiagQuestion(0);
+  updateEvaluationReport();
+  playSfx('pop');
+};
+
+loadDiagQuestion(0);
+updateEvaluationReport();
+
+/* ================= SLIDE 6: TEACHER + AI SYNERGY ================= */
+function spawnHearts(){
+  const zone=$('heartsZone');
+  for(let i=0;i<8;i++)setTimeout(()=>{
+    const s=document.createElement('span');
+    s.textContent=['❤️','💖','✨','⭐'][i%4];
+    s.style.left=(48+Math.random()*42)+'%';
+    s.style.setProperty('--dx',(Math.random()*80-40)+'px');
+    zone.appendChild(s);
+    setTimeout(()=>s.remove(),2000);
+    playSfx('heart');
+  },i*160);
+}
+
+$('synergyBtn').onclick=()=>{
+  $('beamLine').classList.add('on');playSfx('power');
+  setTimeout(()=>{
+    $('aiWho').classList.add('open');$('tcWho').classList.add('open');playSfx('pop');
+  },450);
+  const a=$('admBar'),m=$('menBar');
+  a.style.width='10%';a.textContent='10%';
+  m.style.width='90%';m.textContent='90%';
+  setTimeout(()=>{
+    playSfx('win');boomEl($('synergyBtn'),70);spawnHearts();
+  },850);
+};
+
+/* ================= SLIDE 7: FINISH ================= */
+$('finishBtn').onclick=()=>{
+  boom(innerWidth/2,innerHeight/2,150);
+  playSfx('fanfare');
+};
+
+/* Start deck */
+go(0,true);
+</script>
+</body>
+</html>

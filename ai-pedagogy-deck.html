@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Powered Pedagogy</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--card:#ffffff14;--mut:#c3ccf5;--blue:#4dabf7;--green:#51cf66;--yellow:#ffd43b;--orange:#ff922b;--pink:#f783ac;--purple:#b197fc;--red:#ff6b6b;--ink:#10204a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:linear-gradient(135deg,#0b1030,#1a1450 55%,#0b2a5c);color:#fff;font-family:'Nunito',sans-serif}
+#bg,#fx{position:fixed;inset:0;pointer-events:none}
+#bg{z-index:0}#fx{z-index:50}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.45;z-index:0;animation:drift 18s ease-in-out infinite alternate;pointer-events:none}
+.o1{width:42vw;height:42vw;background:#4dabf7;left:-10vw;top:-12vw}
+.o2{width:38vw;height:38vw;background:#b197fc;right:-10vw;bottom:-14vw;animation-delay:-6s}
+.o3{width:26vw;height:26vw;background:#f783ac;right:25vw;top:-10vw;opacity:.28;animation-delay:-11s}
+@keyframes drift{to{transform:translate(6vw,5vh) scale(1.15)}}
+#prog{position:fixed;top:0;left:0;height:5px;width:0;background:linear-gradient(90deg,var(--yellow),var(--pink),var(--blue));z-index:20;transition:width .5s;box-shadow:0 0 12px var(--yellow)}
+/* slides */
+.slide{position:absolute;inset:0;z-index:2;padding:clamp(18px,4vh,48px) clamp(20px,5vw,72px) 74px;display:flex;flex-direction:column;justify-content:center;opacity:0;pointer-events:none;transform:translateX(80px) scale(.98);filter:blur(6px);transition:opacity .6s,transform .6s,filter .6s;overflow:auto}
+.slide.active{opacity:1;pointer-events:auto;transform:none;filter:none}
+.slide.past{transform:translateX(-80px) scale(.98)}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes popin{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:none}}
+.slide.active .tag,.slide.active h1,.slide.active h2,.slide.active .sub{animation:rise .7s both}
+.slide.active h2,.slide.active h1{animation-delay:.1s}
+.slide.active ul.dots li{animation:rise .7s both}
+.slide.active ul.dots li:nth-child(1){animation-delay:.25s}
+.slide.active ul.dots li:nth-child(2){animation-delay:.45s}
+.slide.active ul.dots li:nth-child(3){animation-delay:.65s}
+.slide.active .demo{animation:popin .8s .3s both}
+.slide.active .flow3{animation:rise .8s .25s both}
+.slide.active .fc{animation:popin .6s both;animation-delay:calc(var(--i)*.07s + .2s)}
+h1{font-family:'Fredoka',sans-serif;font-size:clamp(34px,6vw,78px);line-height:1.05}
+h2{font-family:'Fredoka',sans-serif;font-size:clamp(26px,3.8vw,48px);margin-bottom:6px}
+.grad{background:linear-gradient(90deg,var(--yellow),var(--pink),var(--blue),var(--yellow));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:200% center}}
+.tag{display:inline-block;background:var(--card);border:1px solid #ffffff30;padding:4px 14px;border-radius:99px;font-weight:800;font-size:clamp(12px,1.4vw,16px);color:var(--yellow);margin-bottom:10px;align-self:flex-start;backdrop-filter:blur(6px)}
+.sub{color:var(--mut);font-size:clamp(16px,2vw,26px);margin:8px 0 18px}
+.two{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(16px,3vw,44px);align-items:center;margin-top:12px}
+ul.dots{list-style:none;display:grid;gap:16px}
+ul.dots li{font-size:clamp(17px,2.2vw,28px);padding-left:36px;position:relative;line-height:1.3}
+ul.dots li:before{content:'';position:absolute;left:0;top:.3em;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,var(--c,var(--blue)) 60%);box-shadow:0 0 14px var(--c,var(--blue))}
+ul.dots li strong{color:var(--yellow)}
+.demo{background:linear-gradient(145deg,#ffffff1f,#ffffff0a);backdrop-filter:blur(10px);border:1px solid #ffffff30;box-shadow:0 20px 50px #0006,inset 0 1px 0 #ffffff30;border-radius:24px;padding:clamp(14px,2vw,26px);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative}
+button.b{font-family:'Fredoka',sans-serif;font-size:clamp(14px,1.6vw,20px);border:0;border-radius:14px;padding:10px 20px;cursor:pointer;color:var(--ink);background:linear-gradient(180deg,#ffe066,#ffc107);box-shadow:0 5px 0 #b8941a,0 8px 18px #ffc10755;transition:transform .12s,filter .2s}
+button.b:hover{transform:translateY(-2px) scale(1.04);filter:brightness(1.08)}
+button.b:active{transform:translateY(4px);box-shadow:0 1px 0 #b8941a}
+button.b.alt{background:linear-gradient(180deg,#74c0fc,#4dabf7);box-shadow:0 5px 0 #2a7fc0,0 8px 18px #4dabf755}
+button.b:disabled{opacity:.6;cursor:wait}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.box{background:#00000035;border-radius:14px;padding:10px 14px;width:100%;min-height:56px;font-size:clamp(14px,1.7vw,20px);text-align:center;display:flex;align-items:center;justify-content:center}
+/* nav */
+#nav{position:fixed;bottom:12px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:14px;z-index:10}
+#nav button{background:var(--card);color:#fff;border:1px solid #ffffff30;border-radius:50%;width:42px;height:42px;font-size:20px;cursor:pointer;backdrop-filter:blur(6px);transition:.2s}
+#nav button:hover{background:#ffffff30;transform:scale(1.1)}
+#dots{display:flex;gap:7px}
+#dots i{width:10px;height:10px;border-radius:50%;background:#ffffff40;cursor:pointer;transition:.3s}
+#dots i.on{background:var(--yellow);transform:scale(1.5);box-shadow:0 0 10px var(--yellow)}
+#count{color:var(--mut);font-weight:800;min-width:56px;text-align:center}
+#snd{position:fixed;top:12px;left:14px;z-index:20;background:var(--card);border:1px solid #ffffff30;color:#fff;border-radius:99px;padding:6px 12px;font-size:16px;cursor:pointer;backdrop-filter:blur(6px)}
+.hint{position:fixed;top:14px;right:14px;color:var(--mut);font-size:12px;z-index:20}
+#notes{position:fixed;left:0;right:0;bottom:62px;max-height:38vh;overflow:auto;background:#0a1230ee;border-top:3px solid var(--yellow);padding:14px clamp(20px,5vw,72px);font-size:clamp(14px,1.7vw,20px);line-height:1.45;z-index:15;display:none}
+#notes.show{display:block}
+#notes b{color:var(--yellow)}
+/* shared keyframes */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinr{to{transform:rotate(-360deg)}}
+@keyframes fl{50%{transform:translateY(-12px)}}
+@keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) scale(1.12)}60%{transform:rotate(14deg) scale(1.18)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-18px) scale(1.15)}}
+.float{animation:fl 3s ease-in-out infinite}
+.pill{padding:8px 16px;border-radius:99px;font-weight:800;font-size:clamp(13px,1.6vw,20px);color:var(--ink)}
+/* 1 title */
+.orbit{position:relative;width:min(300px,62vw);aspect-ratio:1;display:grid;place-items:center;margin:14px}
+.orbit:before{content:'';position:absolute;inset:0;border:2px dashed #ffffff35;border-radius:50%;animation:spin 40s linear infinite}
+.orbit .core{font-size:clamp(66px,9vw,104px);width:46%;aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,#ffffff38,#ffffff08);box-shadow:0 0 60px #4dabf790;cursor:pointer;user-select:none;animation:fl 3s ease-in-out infinite}
+.orbit .core.wave{animation:wave .9s}
+.orbit .o{position:absolute;inset:0;animation:spin 16s linear infinite;animation-delay:var(--d)}
+.orbit .o span{position:absolute;top:-.65em;left:50%;margin-left:-.6em;font-size:clamp(28px,4vw,44px);animation:spinr 16s linear infinite;animation-delay:var(--d);filter:drop-shadow(0 0 10px #fff8)}
+.bubble{position:absolute;top:-14px;right:-16px;background:#fff;color:var(--ink);font-weight:800;border-radius:16px 16px 16px 4px;padding:8px 12px;font-size:clamp(12px,1.5vw,17px);max-width:200px;opacity:0;transform:scale(.4);transform-origin:bottom left;transition:.35s cubic-bezier(.3,1.6,.5,1);z-index:3}
+.bubble.on{opacity:1;transform:scale(1)}
+/* 2 pillars */
+.flow3{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:clamp(6px,1.4vw,18px);margin:18px 0 14px}
+.step{background:linear-gradient(145deg,#ffffff1f,#ffffff08);border:2px solid #ffffff25;border-radius:24px;padding:clamp(14px,2vw,28px);text-align:center;opacity:.4;transform:scale(.93);transition:.5s}
+.step.lit{opacity:1;transform:scale(1);border-color:var(--c);box-shadow:0 0 34px var(--c),inset 0 0 22px #ffffff12}
+.step .ic{font-size:clamp(40px,6vw,76px);display:inline-block}
+.step.lit .ic{animation:bounce .8s}
+.step h3{font-family:'Fredoka',sans-serif;font-size:clamp(18px,2.4vw,30px);margin:6px 0;color:var(--c)}
+.step p{font-size:clamp(14px,1.7vw,21px);color:var(--mut)}
+.arr{font-size:clamp(28px,4vw,52px);color:#ffffff30;transition:.4s;text-align:center}
+.arr.lit{color:var(--yellow);text-shadow:0 0 18px var(--yellow);animation:nudge .6s infinite alternate}
+@keyframes nudge{to{transform:translateX(8px)}}
+.track{height:10px;border-radius:99px;background:#00000040;overflow:hidden;margin-bottom:14px}
+.track i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--yellow),var(--green));transition:width 2.2s linear}
+/* 3 planning */
+.prompt{width:100%;background:#0a0f2a;border:1px solid #ffffff30;border-radius:14px;padding:10px 14px;font-size:clamp(12px,1.45vw,17px);line-height:1.4;text-align:left;font-family:ui-monospace,Menlo,Consolas,monospace;color:#9be7ff}
+.prompt .pl{color:var(--yellow);font-weight:800}
+.cur{display:inline-block;width:8px;height:1em;background:#9be7ff;vertical-align:-2px;margin-left:2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.tlwrap{position:relative;width:100%}
+.tl{display:flex;width:100%;height:68px;border-radius:14px;gap:3px}
+.tl div{display:flex;align-items:center;justify-content:center;font-family:'Fredoka',sans-serif;color:var(--ink);cursor:pointer;font-size:clamp(11px,1.4vw,18px);text-align:center;transition:.4s;padding:2px;border-radius:10px;opacity:.28;filter:grayscale(.9)}
+.tl div.in{opacity:1;filter:none;animation:grow .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes grow{from{transform:scaleY(.2)}to{transform:scaleY(1)}}
+.tl div:hover,.tl div.sel{filter:brightness(1.2);transform:scaleY(1.14);box-shadow:0 0 18px #fff6}
+.ph{position:absolute;top:-8px;bottom:-8px;width:4px;left:0;background:#fff;border-radius:4px;box-shadow:0 0 14px #fff;opacity:0;pointer-events:none}
+.clock{align-self:flex-start;font-weight:800;color:var(--yellow);font-size:clamp(13px,1.5vw,18px)}
+/* 4 delivery */
+.vis{width:100%;min-height:210px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.textwall{font-size:clamp(9px,1.05vw,13px);color:#9aa6d6;line-height:1.35;text-align:left;max-height:220px;overflow:hidden;position:relative}
+.zzz{position:absolute;right:6px;top:6px;font-size:28px;animation:fl 2s infinite}
+#circ{width:100%;max-width:400px}
+.wire{stroke:#8da2e8;stroke-width:5;fill:none;stroke-linejoin:round}
+#rays{transform-origin:370px 130px;animation:spin 6s linear infinite}
+.bar{display:flex;align-items:center;gap:10px;width:100%;font-size:clamp(13px,1.6vw,19px)}
+.bar span.l{width:150px;flex-shrink:0}
+.bar .tr{flex:1;background:#00000050;border-radius:99px;height:26px;overflow:hidden}
+.bar .f{height:100%;width:0;border-radius:99px;transition:width .8s,background .6s;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-weight:800;color:var(--ink);font-size:14px}
+.bar.hot .f{animation:hotp .5s infinite alternate}
+@keyframes hotp{to{box-shadow:0 0 18px var(--red);filter:brightness(1.3)}}
+/* 5 assessment */
+.qh{font-weight:800;text-align:center;font-size:clamp(14px,1.7vw,20px)}
+.qh small{display:block;color:var(--mut);font-weight:700}
+.avs{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;width:100%}
+.avs i{font-style:normal;aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:#ffffff14;font-size:clamp(11px,1.5vw,19px);opacity:.6;transition:.3s}
+.avs i.a{opacity:1;color:var(--ink);font-weight:800;font-family:'Fredoka',sans-serif;animation:pop2 .4s}
+.avs i.a0{background:var(--green)}.avs i.a1{background:var(--red)}.avs i.a2{background:var(--orange)}.avs i.a3{background:var(--purple)}
+@keyframes pop2{0%{transform:scale(.3)}70%{transform:scale(1.4)}100%{transform:scale(1)}}
+.radar{width:56px;height:56px;border-radius:50%;border:2px solid var(--green);position:relative;overflow:hidden;background:repeating-radial-gradient(circle,#51cf6633 0 1px,transparent 1px 9px)}
+.radar:after{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#51cf6600 0 70%,#51cf66dd);animation:spin 1.4s linear infinite;animation-play-state:paused}
+.radar.on:after{animation-play-state:running}
+.alert{background:linear-gradient(90deg,#e03131,#ff6b6b);color:#fff;border-radius:14px;padding:8px 14px;font-weight:800;opacity:0;transform:scale(.8);transition:.4s cubic-bezier(.3,1.6,.5,1);text-align:center;font-size:clamp(13px,1.6vw,19px)}
+.alert.on{opacity:1;transform:scale(1);animation:sh .5s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+/* 6 synergy */
+.duo{display:grid;grid-template-columns:1fr 54px 1fr;align-items:center;gap:6px;width:100%}
+.who{border-radius:18px;padding:12px;text-align:center;font-weight:800;font-size:clamp(13px,1.6vw,19px);color:var(--ink)}
+.who.ai{background:linear-gradient(160deg,#74c0fc,#4dabf7)}.who.tc{background:linear-gradient(160deg,#faa2c1,#f783ac)}
+.who .big{display:block;font-size:clamp(34px,5vw,58px);animation:fl 3s infinite}
+.who ul{list-style:none;font-weight:700;opacity:0;max-height:0;overflow:hidden;transition:.6s}
+.who.open ul{opacity:1;max-height:120px;margin-top:4px}
+.beam{height:8px;border-radius:9px;background:#ffffff25;position:relative;overflow:hidden}
+.beam i{position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--blue),#fff,var(--pink));transition:width 1s}
+.beam.on i{width:100%;animation:glowp .7s infinite alternate}
+@keyframes glowp{to{filter:brightness(1.6)}}
+.hearts{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:24px}
+.hearts span{position:absolute;bottom:18%;font-size:28px;animation:hrise 2.1s ease-out forwards}
+@keyframes hrise{to{transform:translate(var(--dx),-190px);opacity:0}}
+/* 7 flip */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.6vw,20px);margin-top:14px}
+.fc{perspective:900px;height:clamp(110px,19vh,170px);cursor:pointer}
+.fc .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.fc:hover .in{filter:brightness(1.1)}
+.fc.flip .in{transform:rotateY(180deg)}
+.fc .f,.fc .bk{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;font-family:'Fredoka',sans-serif;font-size:clamp(14px,1.8vw,22px);color:var(--ink);box-shadow:0 10px 24px #0005}
+.fc .f em{font-style:normal;font-size:clamp(26px,3.6vw,44px)}
+.fc .bk{transform:rotateY(180deg);background:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:clamp(12px,1.5vw,18px)}
+.c1{background:linear-gradient(145deg,#74c0fc,#4dabf7)}.c2{background:linear-gradient(145deg,#8ce99a,#51cf66)}.c3{background:linear-gradient(145deg,#ffe066,#fcc419)}.c4{background:linear-gradient(145deg,#faa2c1,#f783ac)}.c5{background:linear-gradient(145deg,#ffc078,#ff922b)}.c6{background:linear-gradient(145deg,#d0bfff,#b197fc)}
+/* 8 quiz */
+.qdots{display:flex;gap:8px;margin-bottom:6px}
+.qdots i{width:34px;height:8px;border-radius:9px;background:#ffffff30;transition:.4s}
+.qdots i.d{background:var(--green)}.qdots i.c{background:var(--yellow)}
+.q{font-size:clamp(20px,2.8vw,36px);margin:10px 0 16px;font-family:'Fredoka',sans-serif}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{background:linear-gradient(145deg,#ffffff1f,#ffffff0a);border:2px solid #ffffff30;border-radius:18px;padding:clamp(12px,2vw,22px);font-size:clamp(15px,2vw,24px);cursor:pointer;transition:.2s;font-weight:700}
+.opt:hover{border-color:var(--yellow);transform:translateY(-3px)}
+.opt.ok{background:#2f9a4599;border-color:var(--green);box-shadow:0 0 24px var(--green)}
+.opt.no{background:#c9303099;border-color:var(--red);animation:sh .4s}
+.score{font-family:'Fredoka',sans-serif;font-size:clamp(28px,5vw,60px);text-align:center}
+.streak{color:var(--orange);font-weight:800;min-height:24px}
+/* 9 end */
+.end{align-items:center;text-align:center}
+.bigemoji{font-size:clamp(70px,12vw,140px)}
+.fe{position:absolute;font-size:clamp(26px,4vw,48px);animation:fl 4s ease-in-out infinite;opacity:.8}
+@media(max-width:900px){.two{grid-template-columns:1fr!important}.cards{grid-template-columns:repeat(2,1fr)}.flow3{grid-template-columns:1fr}.arr{transform:rotate(90deg)}.opts{grid-template-columns:1fr}.hint{display:none}.bar span.l{width:110px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas><canvas id="fx"></canvas>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+<div id="prog"></div>
+<button id="snd" title="Sound on/off">🔊</button>
+<div class="hint">← → navigate · N = notes · F = fullscreen</div>
+
+<!-- 1 TITLE -->
+<section class="slide" data-note="<b>(1.5 min)</b> Namaste judges/everyone. Aaj ka topic traditional vs modern teaching ki debate nahi hai, balki yeh hai ki ek teacher technology ko pedagogy ke saath jodkar classroom experience ko 10x engaging kaise bana sakta hai. Aaj hum 3 practical steps dekhenge: Lesson Planning, Visual Delivery with Simulations, aur AI-Driven Assessment.">
+  <span class="tag">🎓 Educator's Playbook</span>
+  <div class="two" style="grid-template-columns:1.3fr 1fr">
+    <div>
+      <h1 class="grad">AI-Powered Pedagogy</h1>
+      <p class="sub">Transforming Classroom Teaching — From Planning to Assessment</p>
+      <ul class="dots"><li style="--c:var(--green)">Objective wahi, <strong>delivery method upgrade</strong></li></ul>
+      <div class="row" style="justify-content:flex-start;margin-top:18px">
+        <span class="pill" style="background:var(--blue)">1 Plan Faster</span><span class="pill" style="background:var(--yellow)">→ 2 Deliver Visually</span><span class="pill" style="background:var(--green)">→ 3 Assess Smartly</span>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="orbit">
+        <div class="core" id="stage">👩‍🏫</div>
+        <div class="o" style="--d:0s"><span>🤖</span></div>
+        <div class="o" style="--d:-4s"><span>📚</span></div>
+        <div class="o" style="--d:-8s"><span>💡</span></div>
+        <div class="o" style="--d:-12s"><span>📊</span></div>
+        <div class="bubble" id="bubble"></div>
+      </div>
+      <button class="b" id="waveBtn">Teacher ko Namaste bolo 👋</button>
+    </div>
+  </div>
+</section>
+
+<!-- 2 OVERVIEW -->
+<section class="slide" data-note="<b>(1 min)</b> Ek successful class in teen steps par khadi hoti hai. Pehle time bache preparation mein, lecture mein student ka attention freeze ho, aur class khatam hone se pehle pata chal jaye ki kis student ko kya samajh aaya.">
+  <span class="tag">Overview</span>
+  <h2>The 3 Pillars of Effective Teaching</h2>
+  <div class="flow3" id="steps">
+    <div class="step" style="--c:var(--blue)"><div class="ic">📝</div><h3>Lesson Planning</h3><p>Syllabus → 45-min engaging flow</p></div>
+    <div class="arr">➜</div>
+    <div class="step" style="--c:var(--yellow)"><div class="ic">🎬</div><h3>Lecture Delivery</h3><p>Text ki jagah Simulations & Diagrams</p></div>
+    <div class="arr">➜</div>
+    <div class="step" style="--c:var(--green)"><div class="ic">📊</div><h3>Smart Assessment</h3><p>Live quiz + real-time analytics</p></div>
+  </div>
+  <div class="track"><i id="trk"></i></div>
+  <div class="row"><button class="b" id="runSteps">▶ Run the Framework</button><button class="b alt" id="resetSteps">↺ Reset</button></div>
+</section>
+
+<!-- 3 PLANNING -->
+<section class="slide" data-note="<b>(3 min)</b> Jab teacher planning mein ghanto fas jaata hai, toh energy exhaust ho jaati hai. AI se hum sirf topic nahi maangte, hum bolte hain: 'Mujhe Grade 8 ke liye Photosynthesis ka 40-minute plan do jisme 5-minute ka real-world hook ho, do analogies hon, aur fast-learners ke liye challenge ho.' Isse planning automated hoti hai aur quality consistent rehti hai.">
+  <span class="tag">Step 1</span>
+  <h2>AI-Automated Lesson Planning</h2>
+  <div class="two">
+    <ul class="dots">
+      <li style="--c:var(--blue)"><strong>Objective-first:</strong> outcome set karo, AI Bloom's Taxonomy se structure dega</li>
+      <li style="--c:var(--green)"><strong>Differentiated tracks:</strong> basic aur advanced learners ke liye alag</li>
+      <li style="--c:var(--orange)"><strong>2 ghante → 10 minute</strong> planning time</li>
+    </ul>
+    <div class="demo" style="gap:9px">
+      <div class="prompt"><span class="pl">🧑‍💻 Teacher:</span> <span id="ptxt"></span><i class="cur"></i></div>
+      <div class="row"><button class="b" id="genBtn">✨ AI se Plan Banao</button><button class="b alt" id="playBtn">▶ Period Chalao</button></div>
+      <div class="clock" id="clock">⏱ 0 / 45 min</div>
+      <div class="tlwrap">
+        <div class="tl" id="tl">
+          <div style="flex:5;background:var(--pink)" data-t="🪝 Hook (5 min): real-world sawal ya short story se attention pakdo.">Hook<br>5</div>
+          <div style="flex:15;background:var(--blue)" data-t="💡 Core Concept (15 min): analogy + visual ke saath main idea samjhao.">Core Concept 15</div>
+          <div style="flex:15;background:var(--green)" data-t="🧪 Activity (15 min): students khud karke seekhte hain — pair/group task.">Activity 15</div>
+          <div style="flex:10;background:var(--yellow)" data-t="✅ Wrap-up (10 min): quick recap + exit quiz.">Wrap-up 10</div>
+        </div>
+        <div class="ph" id="ph"></div>
+      </div>
+      <div class="box" id="tlBox">👆 Plan banao ya kisi block par tap karo</div>
+      <div class="row"><button class="b alt" id="trB">🌱 Basic</button><button class="b" id="trA">🚀 Advanced</button></div>
+      <div class="box" id="trBox" style="min-height:48px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 DELIVERY -->
+<section class="slide" data-note="<b>(4.5 min)</b> Bullet points padhkar sunana teaching nahi hai. Agar hum bacche ko 'electric circuit' padha rahe hain, toh definition ratane ke bajaye hum screen par ek interactive simulation ya visual chalate hain jahan switch on karne par current flow hota dikhta hai. AI tools se aise interactive visual aids aur diagrams generate karna ab minutes ka kaam hai. Jab student dekhta hai, tab woh relate karta hai.">
+  <span class="tag">Step 2</span>
+  <h2>Immersive Delivery — Beyond Boring Bullet Points</h2>
+  <div class="two">
+    <ul class="dots">
+      <li style="--c:var(--yellow)"><strong>Dual Coding:</strong> dimag text se zyada visuals process karta hai</li>
+      <li style="--c:var(--blue)"><strong>Interactive simulations</strong> — real-time working models</li>
+      <li style="--c:var(--pink)"><strong>AI diagrams</strong> invisible concepts ke liye</li>
+    </ul>
+    <div class="demo">
+      <div class="row"><button class="b alt" id="modeText">📄 Text-Heavy</button><button class="b" id="modeVis">⚡ Visual-First</button></div>
+      <div class="vis" id="visBox"></div>
+      <div class="bar"><span class="l">Student attention</span><div class="tr"><div class="f" id="attF"></div></div><span id="attE" style="font-size:28px">😴</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 ASSESSMENT -->
+<section class="slide" data-note="<b>(3.5 min)</b> Sabse badi problem yeh hoti hai ki teacher padha ke chala jaata hai aur pata nahi chalta kitno ko samajh aaya. Hamare framework ka teesra hissa hai AI-powered assessment. Class ke end mein AI lecture content se instant quiz generate karta hai. Jaise hi bachhe respond karte hain, AI real-time mein report deta hai: 'Bachho ko formula toh pata hai, lekin application galat ki.' Isse feedback loop complete hota hai.">
+  <span class="tag">Step 3</span>
+  <h2>Real-Time Assessment & Misconception Radar</h2>
+  <div class="two">
+    <ul class="dots">
+      <li style="--c:var(--green)"><strong>5-minute</strong> interactive quiz class ke end mein</li>
+      <li style="--c:var(--red)"><strong>Misconception</strong> turant pakdo — kitne bachhe kahan confuse</li>
+      <li style="--c:var(--purple)"><strong>Feedback loop:</strong> agli class kahan se shuru, pata hai</li>
+    </ul>
+    <div class="demo" style="gap:9px">
+      <div class="qh">Q: Speed = ?<small>Class ke 30 students ka live response</small></div>
+      <div class="avs" id="avs"></div>
+      <div id="bars" style="width:100%;display:grid;gap:7px"></div>
+      <div class="row"><div class="radar" id="radar"></div><button class="b" id="radarBtn">📡 Quiz Chalao</button></div>
+      <div class="alert" id="alertBox">⚠ 40% bachhe B mein confuse — kal isse dobara cover karo!</div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 VERDICT -->
+<section class="slide" data-note="<b>(1.5 min)</b> AI teacher ko replace karne ke liye nahi hai, balki teacher ko supercharge karne ke liye hai. Jab preparation automated ho, delivery visually rich ho, aur assessment instant ho—tab classroom boring nahi, exciting ban jaata hai. Thank you!">
+  <span class="tag">The Verdict</span>
+  <h2>Teacher + AI Synergy</h2>
+  <div class="two">
+    <ul class="dots">
+      <li style="--c:var(--blue)">AI = <strong>prep aur execution</strong> ka engine</li>
+      <li style="--c:var(--pink)"><strong>Connection & empathy</strong> teacher ki hai</li>
+      <li style="--c:var(--green)">Admin se azaadi → <strong>mentorship par focus</strong></li>
+    </ul>
+    <div class="demo">
+      <div class="duo">
+        <div class="who ai" id="aiC"><span class="big">🤖</span>AI Engine<ul><li>Planning</li><li>Formatting</li><li>Quiz & Reports</li></ul></div>
+        <div class="beam" id="beam"><i></i></div>
+        <div class="who tc" id="tcC"><span class="big">👩‍🏫</span>Teacher<ul><li>Empathy</li><li>Mentoring</li><li>Inspiration</li></ul></div>
+      </div>
+      <div class="bar"><span class="l">Admin work</span><div class="tr"><div class="f" id="admF" style="width:70%;background:var(--orange)">70%</div></div></div>
+      <div class="bar"><span class="l">Mentoring</span><div class="tr"><div class="f" id="menF" style="width:30%;background:var(--green)">30%</div></div></div>
+      <button class="b" id="synBtn">🤝 Teacher + AI Jodo</button>
+      <div class="hearts" id="hearts"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 FLIP -->
+<section class="slide" data-note="<b>Revision:</b> Cards par click karke answer dekho. Audience se pehle bulwao, phir flip karo.">
+  <span class="tag">Quick Revision</span>
+  <h2>Flip karo, yaad karo! 🃏</h2>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- 8 QUIZ -->
+<section class="slide" data-note="<b>Mini Quiz:</b> 4 sawal. Audience se answer bulwao, phir click karo.">
+  <span class="tag">Mini Quiz</span>
+  <div id="quiz"></div>
+</section>
+
+<!-- 9 END -->
+<section class="slide end" data-note="<b>Thank you!</b> Questions invite karo. AI teacher ko replace nahi karta — supercharge karta hai.">
+  <span class="fe" style="left:8%;top:18%">🤖</span><span class="fe" style="right:10%;top:20%;animation-delay:-1s">📚</span><span class="fe" style="left:14%;bottom:20%;animation-delay:-2s">💡</span><span class="fe" style="right:14%;bottom:22%;animation-delay:-3s">📊</span>
+  <div class="bigemoji float">🎓</div>
+  <h1 class="grad">Thank You!</h1>
+  <p class="sub">AI teacher ko replace nahi karta — usse <strong style="color:var(--yellow)">supercharge</strong> karta hai ⚡</p>
+  <div class="row"><button class="b" id="endBtn">🎉 Questions?</button></div>
+</section>
+
+<div id="notes"></div>
+<div id="nav"><button id="prev">‹</button><div id="dots"></div><div id="count"></div><button id="next">›</button></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- AUDIO (Web Audio, user-triggered only) ---------- */
+let AC=null,soundOn=true,armed=false;
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{armed=true},{once:true,capture:true}));
+function ac(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}
+function tone(f,d=.15,type='sine',vol=.15,when=0,slide=1){
+  if(!soundOn||!armed)return;
+  try{const a=ac(),t=a.currentTime+when,o=a.createOscillator(),g=a.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);if(slide!==1)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*slide),t+d);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.03)}catch(e){}
+}
+function noise(d=.35,f0=300,f1=2500,vol=.12){
+  if(!soundOn||!armed)return;
+  try{const a=ac(),t=a.currentTime,n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),dt=b.getChannelData(0);
+    for(let i=0;i<n;i++)dt[i]=Math.random()*2-1;
+    const s=a.createBufferSource();s.buffer=b;
+    const fl=a.createBiquadFilter();fl.type='bandpass';fl.Q.value=1.2;fl.frequency.setValueAtTime(f0,t);fl.frequency.exponentialRampToValueAtTime(f1,t+d);
+    const g=a.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    s.connect(fl);fl.connect(g);g.connect(a.destination);s.start(t)}catch(e){}
+}
+const SFX={
+  click:()=>tone(520,.07,'triangle',.12),
+  pop:()=>tone(300,.14,'sine',.2,0,2.4),
+  whoosh:()=>noise(.4,250,3000,.1),
+  tick:(p=1)=>tone(900*p,.05,'square',.05),
+  type:()=>tone(1200+Math.random()*300,.03,'square',.03),
+  ding:()=>{tone(880,.5,'sine',.15);tone(1320,.6,'sine',.1,.08)},
+  win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.15,i*.1)),
+  fanfare:()=>[523,523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.16,i*.12)),
+  wrong:()=>tone(180,.3,'sawtooth',.12,0,.6),
+  warn:()=>{tone(440,.15,'square',.1);tone(330,.25,'square',.1,.16)},
+  flip:()=>noise(.18,1200,4000,.08),
+  sw:()=>{tone(220,.05,'square',.12);tone(140,.08,'square',.1,.05)},
+  power:()=>tone(200,.5,'sawtooth',.08,0,5),
+  note:(i=0)=>tone(392*Math.pow(1.26,i),.35,'triangle',.15),
+  heart:()=>tone(660,.2,'sine',.12,0,1.5)
+};
+function sfx(n,...a){try{SFX[n](...a)}catch(e){}}
+$('snd').onclick=()=>{soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇';if(soundOn){armed=true;sfx('ding')}};
+document.addEventListener('click',e=>{if(e.target.closest('button.b'))sfx('click')});
+
+/* ---------- CONFETTI ---------- */
+const fx=$('fx'),fc=fx.getContext('2d');let parts=[],fxRun=false;
+function sizeFx(){fx.width=innerWidth;fx.height=innerHeight}
+addEventListener('resize',sizeFx);sizeFx();
+function boom(x=innerWidth/2,y=innerHeight/2,n=110){
+  if(rm)return;const cols=['#ffd43b','#ff6b6b','#4dabf7','#51cf66','#f783ac','#b197fc','#ff922b'];
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=4+Math.random()*9;
+    parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-6,g:.25,w:6+Math.random()*6,h:4+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[i%cols.length],life:100+Math.random()*60})}
+  if(!fxRun){fxRun=true;requestAnimationFrame(stepFx)}
+}
+function stepFx(){
+  fc.clearRect(0,0,fx.width,fx.height);parts=parts.filter(p=>p.life>0);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=.99;p.r+=p.vr;p.life--;
+    fc.save();fc.globalAlpha=Math.min(1,p.life/40);fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillStyle=p.c;fc.fillRect(-p.w/2,-p.h/2,p.w,p.h);fc.restore()});
+  if(parts.length)requestAnimationFrame(stepFx);else{fxRun=false;fc.clearRect(0,0,fx.width,fx.height)}
+}
+function boomEl(el,n=60){const r=el.getBoundingClientRect();boom(r.left+r.width/2,r.top+r.height/2,n)}
+
+/* ---------- BACKGROUND PARTICLES ---------- */
+const bg=$('bg'),bc=bg.getContext('2d');let P=[];
+function sizeBg(){bg.width=innerWidth;bg.height=innerHeight;P=Array.from({length:Math.min(70,Math.floor(innerWidth/22))},()=>({x:Math.random()*bg.width,y:Math.random()*bg.height,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:1+Math.random()*2}))}
+function drawBg(){
+  bc.clearRect(0,0,bg.width,bg.height);
+  for(const p of P){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>bg.width)p.vx*=-1;if(p.y<0||p.y>bg.height)p.vy*=-1;bc.fillStyle='#ffffff55';bc.beginPath();bc.arc(p.x,p.y,p.r,0,7);bc.fill()}
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=dx*dx+dy*dy;
+    if(d<14000){bc.strokeStyle='rgba(120,160,255,'+(.25*(1-d/14000))+')';bc.beginPath();bc.moveTo(P[i].x,P[i].y);bc.lineTo(P[j].x,P[j].y);bc.stroke()}}
+  if(!rm)requestAnimationFrame(drawBg)
+}
+addEventListener('resize',sizeBg);sizeBg();drawBg();
+
+/* ---------- ENGINE ---------- */
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const dots=$('dots');
+slides.forEach((s,i)=>{const d=document.createElement('i');d.onclick=()=>go(i);dots.appendChild(d)});
+function go(n,silent){
+  const old=cur;cur=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>{s.classList.toggle('active',i===cur);s.classList.toggle('past',i<cur)});
+  [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===cur));
+  $('count').textContent=(cur+1)+' / '+slides.length;
+  $('prog').style.width=((cur+1)/slides.length*100)+'%';
+  $('notes').innerHTML='<b>🎤 Speaker Note:</b> '+(slides[cur].dataset.note||'');
+  if(!silent&&old!==cur){sfx('whoosh');if(cur===slides.length-1){setTimeout(()=>{boom(innerWidth/2,innerHeight/3,150);sfx('fanfare')},500)}}
+}
+$('prev').onclick=()=>go(cur-1);$('next').onclick=()=>go(cur+1);
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','PageUp'].includes(e.key))go(cur-1);
+  else if(e.key==='n'||e.key==='N')$('notes').classList.toggle('show');
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+});
+let tx=null;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>60)go(cur+(d<0?1:-1));tx=null});
+
+/* ---------- 1 TITLE ---------- */
+const greets=['Namaste! Aaj kuch naya seekhenge 🙏','AI mera co-pilot hai ✈️','Chalo class shuru karte hain! 🚀'];let gi=0,bT=null;
+$('waveBtn').onclick=()=>{
+  const s=$('stage');s.classList.remove('wave');void s.offsetWidth;s.classList.add('wave');
+  const b=$('bubble');b.textContent=greets[gi++%greets.length];b.classList.add('on');clearTimeout(bT);bT=setTimeout(()=>b.classList.remove('on'),2600);
+  sfx('pop');sfx('ding');boomEl(s,50);
+};
+$('stage').onclick=()=>$('waveBtn').click();
+
+/* ---------- 2 PILLARS ---------- */
+let stepT=[];
+function clearSteps(){stepT.forEach(clearTimeout);stepT=[];document.querySelectorAll('#steps .step,#steps .arr').forEach(s=>s.classList.remove('lit'));$('trk').style.transition='none';$('trk').style.width='0'}
+$('runSteps').onclick=()=>{
+  clearSteps();void $('trk').offsetWidth;$('trk').style.transition='width 2.4s linear';$('trk').style.width='100%';
+  const items=[...document.querySelectorAll('#steps > *')];
+  items.forEach((el,i)=>stepT.push(setTimeout(()=>{el.classList.add('lit');if(el.classList.contains('step'))sfx('note',i/2*2.2|0);else sfx('tick',1.5)},i*550)));
+  stepT.push(setTimeout(()=>{sfx('win');boomEl($('trk'),70)},items.length*550+100));
+};
+$('resetSteps').onclick=clearSteps;
+
+/* ---------- 3 PLANNING ---------- */
+const PROMPT='Grade 8 ke liye Photosynthesis ka 45-min plan do — 5-min real-world hook, 2 analogies, aur fast-learners ke liye challenge.';
+$('ptxt').textContent=PROMPT;
+const blocks=[...document.querySelectorAll('#tl div')];
+const spans=[[0,5],[5,20],[20,35],[35,45]];
+let gTimer=null,pTimer=null;
+blocks.forEach(d=>d.onclick=()=>{blocks.forEach(x=>x.classList.remove('sel'));d.classList.add('sel');d.classList.add('in');$('tlBox').textContent=d.dataset.t;sfx('pop')});
+$('genBtn').onclick=()=>{
+  clearInterval(gTimer);clearInterval(pTimer);$('ph').style.opacity=0;
+  blocks.forEach(b=>b.classList.remove('in','sel'));$('tlBox').textContent='🤖 AI plan bana raha hai…';$('clock').textContent='⏱ 0 / 45 min';
+  let i=0;$('ptxt').textContent='';
+  gTimer=setInterval(()=>{
+    $('ptxt').textContent=PROMPT.slice(0,++i);if(i%3===0)sfx('type');
+    if(i>=PROMPT.length){clearInterval(gTimer);sfx('power');
+      blocks.forEach((b,k)=>setTimeout(()=>{b.classList.add('in');sfx('note',k)},k*350+200));
+      setTimeout(()=>{$('tlBox').textContent='✅ 45-min plan ready — block par click karke detail dekho';sfx('ding');boomEl($('tl'),50)},blocks.length*350+500)}
+  },28);
+};
+$('playBtn').onclick=()=>{
+  clearInterval(gTimer);clearInterval(pTimer);blocks.forEach(b=>b.classList.add('in'));
+  let m=0;const ph=$('ph');ph.style.opacity=1;ph.style.left='0%';
+  pTimer=setInterval(()=>{
+    m+=.5;ph.style.left=(m/45*100)+'%';$('clock').textContent='⏱ '+Math.floor(m)+' / 45 min';
+    const k=spans.findIndex(s=>m>=s[0]&&m<s[1]);blocks.forEach((b,j)=>b.classList.toggle('sel',j===k));
+    if(k>=0&&spans[k][0]===m&&m>0){sfx('note',k);$('tlBox').textContent=blocks[k].dataset.t}
+    if(m>=45){clearInterval(pTimer);ph.style.opacity=0;blocks.forEach(b=>b.classList.remove('sel'));sfx('win');$('clock').textContent='⏱ Period complete! 🎉';boomEl($('clock'),60)}
+  },60);
+};
+$('trB').onclick=()=>{$('trBox').textContent='🌱 Basic: real-world analogy se samjhao — jaise leaf = solar panel.';sfx('pop')};
+$('trA').onclick=()=>{$('trBox').textContent='🚀 Advanced: extension question — light kam ho to rate of photosynthesis kaise badlega?';sfx('pop')};
+$('trBox').textContent='🌱 Basic: real-world analogy se samjhao — jaise leaf = solar panel.';
+
+/* ---------- 4 DELIVERY ---------- */
+const wall='Electric circuit ek closed path hota hai jisme electric current flow karta hai. Current ka direction conventional roop se positive terminal se negative terminal ki taraf mana jata hai. Circuit mein battery, switch, wire aur bulb hote hain. Jab switch on hota hai to circuit complete hota hai aur bulb jalta hai. Jab switch off hota hai to circuit open ho jata hai aur current flow nahi karta. Ohm ke niyam ke anusar V = IR hota hai. Series aur parallel circuits mein current aur voltage alag tarah se behave karte hain. Definition yaad karo. Definition yaad karo. Definition yaad karo.';
+const electrons=[...Array(10)].map((_,i)=>`<circle r="5" fill="#ffd43b"><animateMotion dur="4s" repeatCount="indefinite" begin="-${(i*.4).toFixed(1)}s" path="M70 60H370V200H70Z"/></circle>`).join('');
+const rays=[...Array(8)].map((_,i)=>{const a=i*Math.PI/4,x1=370+Math.cos(a)*34,y1=130+Math.sin(a)*34,x2=370+Math.cos(a)*50,y2=130+Math.sin(a)*50;return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`}).join('');
+const circ=`<svg id="circ" viewBox="0 0 440 250"><defs><radialGradient id="glw"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#ffe06600"/></radialGradient></defs>
+<path class="wire" d="M70 60H170M240 60H370V200H70V60"/>
+<rect x="45" y="105" width="50" height="60" rx="8" fill="#1e2f6e" stroke="#51cf66" stroke-width="3"/>
+<text x="70" y="143" text-anchor="middle" font-size="24" fill="#51cf66" font-weight="800">+ −</text>
+<text x="104" y="190" font-size="14" fill="#c3ccf5">Battery</text>
+<circle cx="170" cy="60" r="7" fill="#ffd43b"/><circle cx="240" cy="60" r="7" fill="#ffd43b"/>
+<line id="sw" x1="170" y1="60" x2="240" y2="60" stroke="#ffd43b" stroke-width="7" stroke-linecap="round" style="transform-origin:170px 60px;transform:rotate(-30deg);transition:transform .35s"/>
+<text x="205" y="36" text-anchor="middle" font-size="14" fill="#c3ccf5">Switch</text>
+<circle id="gl" cx="370" cy="130" r="70" fill="url(#glw)" opacity="0" style="transition:opacity .4s"/>
+<g id="rays" opacity="0" stroke="#ffe066" stroke-width="4" stroke-linecap="round" style="transition:opacity .4s">${rays}</g>
+<circle id="bulb" cx="370" cy="130" r="26" fill="#44507a" stroke="#fff" stroke-width="3" style="transition:fill .4s"/>
+<text x="370" y="139" text-anchor="middle" font-size="26">💡</text>
+<g id="els" opacity="0" style="transition:opacity .3s">${electrons}</g></svg>
+<div id="circMsg" style="text-align:center;color:#c3ccf5;font-weight:800">Switch dabao 👇</div><button class="b" id="swBtn">🔘 Switch ON / OFF</button>`;
+function setAtt(p,e,c){const f=$('attF');f.style.width=p+'%';f.style.background=c;f.textContent=p+'%';$('attE').textContent=e}
+function showText(q){$('visBox').innerHTML='<div class="textwall"><span class="zzz">💤</span>'+wall+'</div>';setAtt(15,'😴','var(--red)');if(!q)sfx('wrong')}
+function showVis(){
+  $('visBox').innerHTML=circ;let on=false;setAtt(55,'🙂','var(--orange)');sfx('pop');
+  $('swBtn').onclick=()=>{
+    on=!on;sfx('sw');if(on)setTimeout(()=>sfx('power'),120);
+    $('sw').style.transform=on?'rotate(0deg)':'rotate(-30deg)';
+    $('els').style.opacity=on?1:0;$('rays').style.opacity=on?1:0;$('gl').style.opacity=on?.9:0;
+    $('bulb').style.fill=on?'#ffd43b':'#44507a';$('bulb').style.filter=on?'drop-shadow(0 0 16px #ffd43b)':'none';
+    $('circMsg').textContent=on?'Circuit complete → current flow → bulb jala! ⚡':'Circuit open → current nahi → bulb band';
+    if(on){setAtt(95,'🤩','var(--green)');setTimeout(()=>sfx('ding'),350);boomEl($('bulb'),40)}else setAtt(55,'🙂','var(--orange)');
+  };
+}
+$('modeText').onclick=()=>showText();$('modeVis').onclick=showVis;showText(true);
+
+/* ---------- 5 ASSESSMENT ---------- */
+const OPT=[['A) Distance ÷ Time',13,'--green'],['B) Distance × Time',12,'--red'],['C) Time ÷ Distance',3,'--orange'],['D) Pata nahi',2,'--purple']];
+$('avs').innerHTML=Array.from({length:30},()=>'<i>🧑‍🎓</i>').join('');
+$('bars').innerHTML=OPT.map((o,i)=>`<div class="bar" id="br${i}"><span class="l">${o[0]}</span><div class="tr"><div class="f" id="bf${i}" style="background:var(${o[2]})"></div></div></div>`).join('');
+let rT=null;
+$('radarBtn').onclick=()=>{
+  clearInterval(rT);const av=[...$('avs').children];
+  av.forEach(a=>{a.className='';a.textContent='🧑‍🎓'});
+  OPT.forEach((o,i)=>{$('bf'+i).style.width='0';$('bf'+i).textContent='';$('br'+i).classList.remove('hot')});
+  $('alertBox').classList.remove('on');$('radar').classList.add('on');
+  const seq=[];OPT.forEach((o,i)=>{for(let k=0;k<o[1];k++)seq.push(i)});
+  for(let i=seq.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[seq[i],seq[j]]=[seq[j],seq[i]]}
+  const cnt=[0,0,0,0];let n=0;
+  rT=setInterval(()=>{
+    const c=seq[n],a=av[n];a.className='a a'+c;a.textContent='ABCD'[c];cnt[c]++;
+    const f=$('bf'+c);f.style.width=(cnt[c]/14*100)+'%';f.textContent=cnt[c];sfx('tick',1+c*.25);n++;
+    if(n>=30){clearInterval(rT);$('radar').classList.remove('on');
+      cnt.forEach((v,i)=>{$('bf'+i).textContent=Math.round(v/30*100)+'%'});
+      $('br1').classList.add('hot');setTimeout(()=>{$('alertBox').classList.add('on');sfx('warn')},400)}
+  },110);
+};
+
+/* ---------- 6 SYNERGY ---------- */
+function hearts(){
+  const h=$('hearts');
+  for(let i=0;i<9;i++)setTimeout(()=>{const s=document.createElement('span');s.textContent=['❤️','💖','✨','⭐'][i%4];s.style.left=(52+Math.random()*38)+'%';s.style.setProperty('--dx',(Math.random()*70-35)+'px');h.appendChild(s);setTimeout(()=>s.remove(),2200);sfx('heart')},i*170);
+}
+$('synBtn').onclick=()=>{
+  $('beam').classList.add('on');sfx('power');
+  setTimeout(()=>{$('aiC').classList.add('open');$('tcC').classList.add('open');sfx('pop')},500);
+  const a=$('admF'),m=$('menF');a.style.width='10%';a.textContent='10%';m.style.width='90%';m.textContent='90%';
+  setTimeout(()=>{sfx('win');boomEl($('synBtn'),90);hearts()},900);
+};
+
+/* ---------- 7 FLIP ---------- */
+const FC=[['🧠','Dual Coding','Dimag text se zyada visuals aur models process karta hai','c1'],['🪝','Hook','Class ke shuru ke 5 min — attention pakadne wala sawal','c2'],['🏗️','Bloom\'s Taxonomy','Learning outcomes ka structure jo AI plan mein use karta hai','c3'],['🎯','Differentiated Tracks','Basic aur advanced learners ke liye alag versions','c4'],['⚡','Simulation','Real-time working model, jaise circuit mein current flow','c5'],['📡','Misconception Radar','AI batata hai class ka kitna % galat option par confuse hai','c6'],['🔁','Feedback Loop','Quiz result → agli class ka plan','c1'],['❤️','Teacher\'s Role','Empathy, connection aur mentorship — AI replace nahi kar sakta','c2']];
+FC.forEach(([e,f,b,c],i)=>{const d=document.createElement('div');d.className='fc';d.style.setProperty('--i',i);d.innerHTML=`<div class="in"><div class="f ${c}"><em>${e}</em>${f}</div><div class="bk">${b}</div></div>`;d.onclick=()=>{d.classList.toggle('flip');sfx('flip');if(d.classList.contains('flip'))setTimeout(()=>sfx('ding'),250)};$('cards').appendChild(d)});
+
+/* ---------- 8 QUIZ ---------- */
+const Q=[['Teaching mein kya badla hai?',['Objective','Delivery ka method','Syllabus','Students'],1],['Dual Coding Theory ke hisaab se dimag kya zyada process karta hai?',['Sirf text','Visuals aur dynamic models','Sirf audio','Kuch nahi'],1],['45-min plan ka sahi flow kaun sa hai?',['Activity → Hook → Wrap-up','Wrap-up → Core → Hook','Hook → Core Concept → Activity → Wrap-up','Core → Hook → Quiz'],2],['AI aur teacher ka sahi relation?',['AI teacher ko replace karega','AI teacher ko supercharge karta hai','Teacher ki zaroorat nahi','AI sirf games ke liye'],1]];
+let qi=0,sc=0,streak=0;
+function showQ(){
+  const box=$('quiz');
+  if(qi>=Q.length){
+    box.innerHTML=`<div class="score">🏆 Score: ${sc} / ${Q.length}<br><span style="font-size:.5em;color:var(--mut)">${sc===Q.length?'Zabardast! Perfect! 🎉':'Achha try! Flip cards dobara dekho 😊'}</span></div><div class="row" style="margin-top:20px"><button class="b" id="again">↺ Dobara</button></div>`;
+    $('again').onclick=()=>{qi=0;sc=0;streak=0;showQ()};
+    sfx(sc===Q.length?'fanfare':'win');boom(innerWidth/2,innerHeight/2.5,sc===Q.length?160:70);return}
+  const [q,o,a]=Q[qi];
+  box.innerHTML=`<div class="qdots">${Q.map((_,i)=>`<i class="${i<qi?'d':i===qi?'c':''}"></i>`).join('')}</div><div class="streak">${streak>1?'🔥 Streak x'+streak:''}</div><div class="q">${q}</div><div class="opts">${o.map((t,i)=>`<div class="opt" data-i="${i}">${'ABCD'[i]}) ${t}</div>`).join('')}</div>`;
+  let done=false;
+  box.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+    if(done)return;const i=+el.dataset.i;
+    if(i===a){done=true;sc++;streak++;el.classList.add('ok');sfx('ding');boomEl(el,50);setTimeout(()=>{qi++;showQ()},1000)}
+    else{streak=0;el.classList.add('no');sfx('wrong')}
+  });
+}
+showQ();
+
+/* ---------- 9 END ---------- */
+$('endBtn').onclick=()=>{sfx('fanfare');boom(innerWidth*.3,innerHeight*.5,100);setTimeout(()=>boom(innerWidth*.7,innerHeight*.5,100),250)};
+
+go(0,true);
+</script>
+</body>
+</html>

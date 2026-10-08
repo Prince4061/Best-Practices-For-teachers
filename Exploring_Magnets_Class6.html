@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exploring Magnets – Class 6 Science</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1B33; --bg2:#16264A; --panel:#1B2E57;
+    --ink:#F3F6FF; --muted:#A9B6D3;
+    --red:#FF4D5A; --blue:#3D8BFF; --yellow:#FFD449; --green:#3ED598; --iron:#8A94A8;
+    --head:'Fredoka',system-ui,sans-serif; --body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden}
+  button{font-family:var(--body);cursor:pointer}
+  button:focus-visible,.item:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+
+  /* ---------- Deck shell ---------- */
+  #deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;padding:56px 72px 96px;opacity:0;transform:translateX(60px) scale(.98);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow:hidden}
+  .slide.active{opacity:1;transform:none;pointer-events:auto}
+  .slide.prev{transform:translateX(-60px) scale(.98)}
+  .two{display:grid;grid-template-columns:1fr 1.05fr;gap:48px;height:100%;align-items:center}
+  .chapter{color:var(--yellow);font-family:var(--head);font-weight:600;font-size:18px;margin-bottom:10px}
+  h1{font-family:var(--head);font-weight:700;font-size:clamp(44px,6vw,84px);line-height:1;letter-spacing:-.01em}
+  h2{font-family:var(--head);font-weight:700;font-size:clamp(34px,4.2vw,58px);line-height:1.05;margin-bottom:22px}
+  h3{font-family:var(--head);font-weight:600;font-size:24px;margin-bottom:10px}
+  p,li{font-size:clamp(17px,1.45vw,23px);line-height:1.5;font-weight:500}
+  ul{list-style:none}
+  ul.dots li{position:relative;padding-left:32px;margin-bottom:12px}
+  ul.dots li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:14px;border-radius:50%;background:var(--yellow)}
+  strong{color:var(--yellow);font-weight:800}
+  .hint{color:var(--muted);font-size:16px;margin-top:18px}
+  .panel{background:var(--panel);border-radius:22px;padding:24px 28px}
+  .btn{border:0;border-radius:999px;padding:12px 22px;font-size:17px;font-weight:800;background:var(--yellow);color:#1a1a1a;transition:transform .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--muted)}
+  .btn.small{padding:8px 16px;font-size:15px}
+
+  /* 3D canvases */
+  .stage{position:relative;width:100%;height:100%;min-height:420px;border-radius:26px;background:radial-gradient(circle at 50% 40%,#22396B 0%,var(--bg2) 60%,var(--bg) 100%);overflow:hidden;box-shadow:inset 0 0 0 2px #24396A}
+  .stage canvas{width:100%!important;height:100%!important;display:block;cursor:grab}
+  .stage canvas:active{cursor:grabbing}
+  .stage .tag{position:absolute;left:18px;bottom:16px;color:var(--muted);font-size:14px;font-weight:700}
+  .stage .tools{position:absolute;right:16px;top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+  /* Bottom nav */
+  #nav{position:fixed;left:0;right:0;bottom:0;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:linear-gradient(to top,rgba(15,27,51,.95),rgba(15,27,51,0));z-index:10}
+  #dots{display:flex;gap:7px}
+  #dots span{width:10px;height:10px;border-radius:50%;background:#2E4477;transition:background .3s,transform .3s}
+  #dots span.on{background:var(--yellow);transform:scale(1.35)}
+  .navbtn{width:46px;height:46px;border-radius:50%;border:2px solid #3B5590;background:var(--panel);color:var(--ink);font-size:22px;display:grid;place-items:center}
+  .navbtn:hover{background:#2A4179}
+  #count{color:var(--muted);font-weight:800;font-size:15px;min-width:64px;text-align:center}
+  .navgroup{display:flex;gap:12px;align-items:center}
+
+  /* CSS magnet component */
+  .mag{display:inline-flex;width:190px;height:60px;border-radius:9px;overflow:hidden;font-family:var(--head);font-weight:700;font-size:28px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.35);flex-shrink:0}
+  .mag span{flex:1;display:grid;place-items:center}
+  .mag .n{background:var(--red)} .mag .s{background:var(--blue)}
+  .mag.flip{flex-direction:row-reverse}
+  .mag.v{flex-direction:column;width:60px;height:170px}
+
+  /* ---------- Slide 1 hero ---------- */
+  .hero-title{display:flex;flex-direction:column;justify-content:center}
+  .hero-title .sub{font-size:22px;color:var(--muted);margin-top:20px;max-width:26ch}
+  .keys{margin-top:36px;display:flex;gap:10px;align-items:center;color:var(--muted);font-size:15px}
+  .key{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--panel);border:2px solid #3B5590;font-weight:800;color:var(--ink)}
+
+  /* ---------- Slide 2 what is a magnet ---------- */
+  .pull{position:relative;height:100%;min-height:400px;display:flex;align-items:center;justify-content:center}
+  .pull .mag{position:absolute;left:38px;top:50%;transform:translateY(-50%);width:230px;height:74px;font-size:34px}
+  .obj{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;font-size:15px;color:var(--muted)}
+  .obj .ic{font-size:42px;line-height:1}
+  .obj.iron{animation:pullin 3s ease-in-out infinite}
+  .obj.stay{animation:wiggle 3s ease-in-out infinite}
+  .active .obj{animation-play-state:running}
+  .obj.o1{right:60px;top:40px} .obj.o2{right:40px;top:170px} .obj.o3{right:70px;bottom:120px} .obj.o4{right:150px;bottom:30px}
+  @keyframes pullin{0%,15%{transform:translateX(0)}55%,80%{transform:translateX(-240px) scale(1.1)}100%{transform:translateX(0)}}
+  @keyframes wiggle{0%,15%{transform:translateX(0)}30%{transform:translateX(-16px)}45%{transform:translateX(0)}60%{transform:translateX(-14px)}80%,100%{transform:translateX(0)}}
+
+  /* ---------- Slide 3 uses ---------- */
+  .uses{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;height:100%;align-content:center}
+  .use{background:var(--panel);border-radius:22px;padding:26px 28px;display:grid;grid-template-columns:70px 1fr;gap:18px;align-items:start}
+  .use .ic{font-size:52px;line-height:1}
+  .use h3{margin-bottom:4px}
+  .use p{font-size:17px;color:var(--muted)}
+
+  /* ---------- Slide 4 types ---------- */
+  .typebar{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 22px}
+  .typebar button{border:2px solid #3B5590;background:transparent;color:var(--ink);border-radius:999px;padding:9px 16px;font-size:16px;font-weight:800;transition:.2s}
+  .typebar button.on{background:var(--yellow);color:#1a1a1a;border-color:var(--yellow)}
+  #typeDesc{min-height:130px}
+  #typeDesc h3{color:var(--yellow)}
+
+  /* ---------- Slide 5 sort game ---------- */
+  .sorter{display:grid;grid-template-rows:auto 1fr;gap:18px;height:100%}
+  .zones{display:grid;grid-template-columns:1fr 1fr;gap:18px;height:100%}
+  .zone{border-radius:22px;padding:18px;border:3px dashed #3B5590;min-height:200px;display:flex;flex-direction:column;gap:10px;position:relative}
+  .zone h3{display:flex;align-items:center;gap:10px}
+  .zone.yes{border-color:var(--green)} .zone.no{border-color:var(--red)}
+  .zone .dropped{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+  .items{display:flex;flex-wrap:wrap;gap:10px}
+  .item{border:0;background:var(--panel);color:var(--ink);border-radius:14px;padding:10px 14px;font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px;transition:background .2s}
+  .item:hover{background:#2A4179}
+  .item .ic{font-size:24px}
+  .item.done{opacity:.35;pointer-events:none}
+  .chip{background:var(--bg2);border-radius:12px;padding:8px 12px;font-weight:800;font-size:15px;display:flex;gap:6px;align-items:center;animation:pop .35s ease}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  #sortMsg{font-size:19px;font-weight:800;min-height:30px}
+  #sortMsg.ok{color:var(--green)} #sortMsg.bad{color:var(--red)}
+
+  /* ---------- Slide 6 poles + cut ---------- */
+  .cutdemo{display:flex;justify-content:center;gap:0;transition:gap .8s cubic-bezier(.2,.9,.3,1.3);margin:14px 0 8px}
+  .cutdemo.cut{gap:70px}
+  .half{position:relative;width:170px;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-family:var(--head);font-weight:700;font-size:28px;color:#fff;overflow:hidden}
+  .half.l{background:var(--red);border-radius:9px 0 0 9px} .half.r{background:var(--blue);border-radius:0 9px 9px 0}
+  .half::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .8s .3s}
+  .half.l::after{background:linear-gradient(90deg,var(--red),var(--blue))}
+  .half.r::after{background:linear-gradient(90deg,var(--red),var(--blue))}
+  .cut .half::after{opacity:1}
+  .cut .half{border-radius:9px}
+  .half span{position:relative;z-index:1}
+  .half .new{opacity:0;transform:scale(.3);transition:.5s .7s}
+  .cut .half .new{opacity:1;transform:scale(1)}
+  .scissor{position:absolute;left:50%;top:-40px;transform:translateX(-50%);font-size:34px;opacity:0;pointer-events:none}
+  .cutwrap{position:relative}
+  .cut .scissor{animation:snip 1s ease forwards}
+  @keyframes snip{0%{opacity:0;top:-40px}40%{opacity:1;top:8px}70%{opacity:1;top:8px;transform:translateX(-50%) rotate(-15deg)}100%{opacity:0;top:70px}}
+
+  /* ---------- Slide 7 compass ---------- */
+  .compasswrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;height:100%}
+  .compass{width:100%;max-width:360px;margin:0 auto;display:block}
+  #needle{transform-origin:150px 150px;transform:rotate(0deg)}
+  .earth{width:100%;max-width:340px;margin:0 auto;display:block}
+
+  /* ---------- Slide 8 attract/repel ---------- */
+  .ar{height:100%;display:flex;flex-direction:column;justify-content:center;gap:26px}
+  .arena{position:relative;height:200px;background:var(--bg2);border-radius:22px;display:flex;align-items:center;justify-content:center}
+  .arena .mag{position:absolute;top:50%;transition:transform .9s cubic-bezier(.3,1.4,.4,1)}
+  #magL{left:50%;transform:translate(-100%,-50%) translateX(-90px)}
+  #magR{left:50%;transform:translate(0,-50%) translateX(90px)}
+  .arena.attract #magL{transform:translate(-100%,-50%) translateX(-2px)}
+  .arena.attract #magR{transform:translate(0,-50%) translateX(2px)}
+  .arena.repel #magL{transform:translate(-100%,-50%) translateX(-190px)}
+  .arena.repel #magR{transform:translate(0,-50%) translateX(190px)}
+  .arena .force{position:absolute;top:24px;left:50%;transform:translateX(-50%);font-family:var(--head);font-weight:700;font-size:26px;transition:.3s}
+  .arena.attract .force{color:var(--green)} .arena.repel .force{color:var(--red)}
+  .flipbtns{display:flex;justify-content:center;gap:20px}
+
+  /* ---------- Slide 9 through materials ---------- */
+  .through{position:relative;height:340px;width:100%;max-width:520px;margin:0 auto}
+  .sheet{position:absolute;left:0;right:0;top:150px;height:14px;background:#EADFC5;border-radius:4px;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+  .sheet::before{content:"cardboard sheet";position:absolute;right:8px;top:-24px;font-size:14px;color:var(--muted);font-weight:800}
+  .clip{position:absolute;top:96px;left:40px;font-size:50px;animation:slide 4s ease-in-out infinite alternate}
+  .under{position:absolute;top:180px;left:0;animation:slide 4s ease-in-out infinite alternate}
+  .under .mag{width:150px;height:50px;font-size:24px}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(330px)}}
+
+  /* ---------- Slide 10 magnetization ---------- */
+  .magz{position:relative;height:320px;width:100%;max-width:560px;margin:0 auto}
+  .needle{position:absolute;left:60px;top:200px;width:400px;height:14px;background:linear-gradient(90deg,#c9cfdb,#8a94a8);border-radius:7px 30px 30px 7px}
+  .needle::after{content:"steel needle";position:absolute;left:0;top:22px;font-size:14px;color:var(--muted);font-weight:800}
+  .stroker{position:absolute;left:60px;top:26px}
+  .stroker .mag.v{height:170px}
+  .running .stroker{animation:stroke 1s linear infinite}
+  @keyframes stroke{0%{transform:translate(0,0)}55%{transform:translate(300px,0)}68%{transform:translate(300px,-80px)}92%{transform:translate(0,-80px)}100%{transform:translate(0,0)}}
+  .pins{position:absolute;top:214px;left:44px;width:432px;display:flex;justify-content:space-between;font-size:30px;opacity:0;transition:.5s}
+  .magz.done .pins{opacity:1}
+  .magz.done .needle{background:linear-gradient(90deg,var(--red),#c9cfdb 40%,#c9cfdb 60%,var(--blue))}
+  #strokeCount{font-family:var(--head);font-size:40px;color:var(--yellow);font-weight:700}
+
+  /* ---------- Slide 11 care ---------- */
+  .care{display:grid;grid-template-columns:1fr 1fr;gap:24px;height:100%;align-content:center}
+  .care .panel h3{display:flex;align-items:center;gap:10px}
+  .store{position:relative;height:150px;margin-top:16px;display:flex;flex-direction:column;justify-content:center;gap:10px;align-items:center}
+  .store .row{display:flex;align-items:center;gap:0}
+  .store .keeper{width:22px;height:150px;background:#8a94a8;border-radius:4px;position:absolute;top:0}
+  .store .keeper.a{left:calc(50% - 130px)} .store .keeper.b{left:calc(50% + 108px)}
+  .store .wood{width:190px;height:12px;background:#B27B4C;border-radius:4px}
+  .store .mag{width:190px;height:44px;font-size:22px;box-shadow:none}
+
+  /* ---------- Slide 12 recap ---------- */
+  .recap{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-content:center;height:100%}
+  .recap .panel{display:flex;flex-direction:column;gap:6px}
+  .recap .ic{font-size:40px}
+  .recap p{font-size:18px;color:var(--muted)}
+
+  @media (max-width:900px){
+    .slide{padding:32px 24px 90px}
+    .two,.compasswrap,.care,.uses,.zones{grid-template-columns:1fr}
+    .recap{grid-template-columns:1fr 1fr}
+    .stage{min-height:300px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .obj,.clip,.under,.running .stroker{animation:none!important}
+    .slide{transition:none}
+  }
+
+  /* ================= EXERCISE SLIDES ================= */
+  .divider{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;height:100%}
+  .divider h1{font-size:clamp(50px,7vw,96px)}
+  .divider p{color:var(--muted);max-width:40ch;margin-top:18px}
+  .ans{background:#22396B;border-left:6px solid var(--green);border-radius:14px;padding:14px 18px;margin-top:16px;opacity:0;transform:translateY(10px);transition:.4s}
+  .ans.show{opacity:1;transform:none}
+  .ans p{font-size:18px}
+  .ans strong{color:var(--green)}
+  .qtext{font-size:clamp(18px,1.5vw,22px);color:var(--muted);margin-bottom:18px}
+
+  /* Q1 blanks */
+  .blank{display:inline-block;min-width:110px;border-bottom:3px solid var(--yellow);text-align:center;cursor:pointer;color:transparent;transition:.3s;padding:0 6px;font-weight:800}
+  .blank:hover{background:#22396B}
+  .blank.rev{color:var(--yellow);animation:pop .4s}
+  ol.qs{padding-left:0;list-style:none;display:grid;gap:14px}
+  ol.qs li{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:start}
+  ol.qs .num{font-family:var(--head);color:var(--yellow);font-weight:700}
+
+  /* Q2 true/false */
+  .tf{display:grid;gap:12px}
+  .tf .row{background:var(--panel);border-radius:16px;padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+  .tf .row p{font-size:18px}
+  .tf .why{grid-column:1/-1;font-size:16px;color:var(--muted);display:none}
+  .tf .row.done .why{display:block}
+  .tfb{display:flex;gap:8px}
+  .tfb button{width:48px;height:48px;border-radius:12px;border:2px solid #3B5590;background:transparent;color:var(--ink);font-weight:800;font-size:18px;transition:.2s}
+  .tfb button.correct{background:var(--green);border-color:var(--green);color:#0b2a1e;animation:pop .35s}
+  .tfb button.wrong{background:var(--red);border-color:var(--red);animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  /* Q3 pairs */
+  .pairs{display:grid;gap:14px}
+  .pair{background:var(--panel);border-radius:16px;padding:12px 18px;display:grid;grid-template-columns:200px 1fr auto;align-items:center;gap:16px}
+  .pole{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:22px;color:#fff;transition:transform .8s cubic-bezier(.3,1.4,.4,1),background .3s}
+  .pole.N{background:var(--red)} .pole.S{background:var(--blue)} .pole.Q{background:#55617a}
+  .pair .demo{display:flex;gap:40px;justify-content:center}
+  .pair.attract .demo .pole:first-child{transform:translateX(17px)} .pair.attract .demo .pole:last-child{transform:translateX(-17px)}
+  .pair.repel .demo .pole:first-child{transform:translateX(-30px)} .pair.repel .demo .pole:last-child{transform:translateX(30px)}
+  .pair .res{font-size:19px;font-weight:800}
+  .pair .res b{color:var(--yellow)}
+  .pair.attract .res b{color:var(--green)} .pair.repel .res b{color:var(--red)}
+
+  /* Q4 roll demo */
+  .roll{position:relative;width:100%;max-width:520px;height:320px;margin:0 auto}
+  .roll .mag{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:420px;height:70px;font-size:32px}
+  .pos{position:absolute;top:150px;width:120px;text-align:center}
+  .pos.A{left:20px} .pos.B{left:200px} .pos.C{left:380px}
+  .pos .lbl{font-family:var(--head);font-weight:700;font-size:20px;color:var(--yellow)}
+  .pos .clips{font-size:22px;line-height:1.05;min-height:100px;letter-spacing:-4px}
+  .pos .clips span{display:inline-block;opacity:0;transform:translateY(-14px)}
+  .pos .clips span.in{opacity:1;transform:none;transition:.3s}
+  .pos .cnt{font-family:var(--head);font-size:30px;font-weight:700}
+
+  /* Q5 three bars */
+  .bars{position:relative;height:190px;background:var(--bg2);border-radius:22px;display:flex;align-items:center;justify-content:center;gap:110px;overflow:hidden}
+  .bar{width:170px;height:54px;border-radius:9px;background:#8a94a8;display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:28px;color:#1a1a1a;transition:transform .9s cubic-bezier(.3,1.4,.4,1);position:relative}
+  .bars.attract .bar:first-child{transform:translateX(50px)} .bars.attract .bar:last-child{transform:translateX(-50px)}
+  .bars.repel .bar:first-child{transform:translateX(-70px)} .bars.repel .bar:last-child{transform:translateX(70px)}
+  .bars .force{position:absolute;top:16px;left:0;right:0;text-align:center;font-family:var(--head);font-weight:700;font-size:24px}
+  .bars.attract .force{color:var(--green)} .bars.repel .force{color:var(--red)}
+  .testbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+
+  /* Q6 unmarked magnet */
+  .unm{position:relative;height:260px;background:var(--bg2);border-radius:22px;overflow:hidden}
+  .unm .mag{position:absolute;left:50%;top:60px;transform:translateX(-50%);width:240px;height:64px;font-size:30px}
+  .unm .mag span{transition:background .4s}
+  .unm .mag .q1,.unm .mag .q2{background:#55617a}
+  .unm.leftN .mag .q1{background:var(--red)} .unm.rightS .mag .q2{background:var(--blue)}
+  .unm .known{position:absolute;top:160px;left:50%;transform:translateX(-50%);transition:transform .9s cubic-bezier(.3,1.2,.4,1)}
+  .unm .known .mag{position:static;transform:none;width:170px;height:54px;font-size:24px}
+  .unm.toLeft .known{transform:translateX(-50%) translate(-110px,-70px)}
+  .unm.toRight .known{transform:translateX(-50%) translate(110px,-70px)}
+  .unm.toLeft .mag.target{transform:translateX(-50%) translateX(40px)} .unm.toRight .mag.target{transform:translateX(-50%) translateX(-30px)}
+  .unm .mag.target{transition:transform .9s .5s cubic-bezier(.3,1.4,.4,1)}
+  .unm .note{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-weight:800;font-size:18px}
+
+  /* Q7 hanging */
+  #hang{transform-origin:150px 150px;transform:rotate(65deg);transition:transform 2.6s cubic-bezier(.2,1.5,.4,1)}
+  .hung #hang{transform:rotate(0deg)}
+
+  /* Q8 earth compasses */
+  .cn{transform-origin:center;opacity:0;transition:.5s}
+  .e8 .cn{opacity:1}
+  .polelbl{opacity:0;transition:.5s .6s}
+  .e8 .polelbl{opacity:1}
+
+  /* Q9 screwdriver */
+  .sd{position:relative;height:300px;width:100%;max-width:420px;margin:0 auto}
+  .sd .tool{position:absolute;left:150px;top:0;width:34px;height:190px;background:linear-gradient(#e63946,#c1121f);border-radius:12px 12px 4px 4px}
+  .sd .tool::after{content:"";position:absolute;left:12px;top:180px;width:10px;height:70px;background:linear-gradient(#c9cfdb,#8a94a8);transition:background .4s}
+  .sd.magnetised .tool::after{background:linear-gradient(#c9cfdb,var(--red))}
+  .sd .screw{position:absolute;left:150px;top:230px;font-size:26px;animation:fall 1.6s ease-in infinite}
+  .sd .screw:nth-child(2){left:165px;animation-delay:.5s} .sd .screw:nth-child(3){left:180px;animation-delay:1s}
+  .sd.magnetised .screw{animation:none;top:246px;left:158px}
+  .sd.magnetised .screw:nth-child(2){left:172px} .sd.magnetised .screw:nth-child(3){left:165px;top:262px}
+  @keyframes fall{0%{transform:translateY(0);opacity:1}100%{transform:translateY(70px);opacity:0}}
+  .sd .floor{position:absolute;left:40px;right:40px;top:300px;height:6px;background:#3B5590;border-radius:3px}
+  .sd .sparkle{position:absolute;left:120px;top:210px;font-size:22px;opacity:0}
+  .sd.magnetised .sparkle{animation:pop .5s forwards}
+
+  /* Q10 ring magnets */
+  .stand{position:relative;width:260px;height:300px;margin:0 auto}
+  .stand .base{position:absolute;left:0;right:0;bottom:0;height:22px;background:#B27B4C;border-radius:6px}
+  .stand .stick{position:absolute;left:50%;bottom:22px;width:16px;height:250px;margin-left:-8px;background:#8C5A33;border-radius:8px 8px 0 0}
+  .ring{position:absolute;left:50%;width:170px;height:46px;margin-left:-85px;border-radius:50%/50%;display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:22px;color:#fff;box-shadow:0 10px 0 var(--blue);transition:bottom 1s cubic-bezier(.4,1.5,.5,1) .6s,transform .6s}
+  .ring.Y{bottom:34px;background:var(--red)}
+  .ring.X{bottom:150px;background:var(--blue);box-shadow:0 10px 0 var(--red)}
+  .stand.flipped .ring.X{transform:rotate(180deg);bottom:84px}
+  .stand.flipped .ring.X b{display:inline-block;transform:rotate(180deg)}
+  .facing{position:absolute;right:-120px;top:40%;font-size:15px;color:var(--muted);font-weight:800;width:110px}
+
+  /* Q11 */
+  .q11 rect{transition:fill .5s}
+  .q11 text{font-family:var(--head);font-weight:700;font-size:22px;fill:#fff;text-anchor:middle}
+  .q11 .end{fill:#F3F6FF;font-size:16px}
+  .q11 .hi{stroke:var(--yellow);stroke-width:4}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- 1. TITLE -->
+<section class="slide" id="s1">
+  <div class="two">
+    <div class="hero-title">
+      <div class="chapter">Class 6 · Science</div>
+      <h1>Exploring<br>Magnets</h1>
+      <p class="sub">Why does a fridge door stay shut? What makes a compass point north? Let's find out.</p>
+      <div class="keys"><span class="key">←</span><span class="key">→</span> use arrow keys to move between slides</div>
+    </div>
+    <div class="stage">
+      <canvas id="c1"></canvas>
+      <div class="tools"><button class="btn small" id="sprinkle">Sprinkle iron filings</button></div>
+      <div class="tag">Drag to rotate the magnet</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. WHAT IS A MAGNET -->
+<section class="slide" id="s2">
+  <div class="two">
+    <div>
+      <div class="chapter">1 · Definition</div>
+      <h2>What is a magnet?</h2>
+      <ul class="dots">
+        <li>A <strong>magnet</strong> is an object that attracts certain metals toward itself.</li>
+        <li>It attracts <strong>iron, nickel, cobalt</strong> and <strong>steel</strong>.</li>
+        <li>Steel is attracted because it contains iron.</li>
+      </ul>
+      <p class="hint">Watch: the iron nail and steel spoon get pulled. The wood and plastic don't move.</p>
+    </div>
+    <div class="stage pull">
+      <div class="mag"><span class="n">N</span><span class="s">S</span></div>
+      <div class="obj iron o1"><span class="ic">🔩</span>iron nail</div>
+      <div class="obj stay o2"><span class="ic">🪵</span>wooden block</div>
+      <div class="obj iron o3"><span class="ic">🥄</span>steel spoon</div>
+      <div class="obj stay o4"><span class="ic">📏</span>plastic ruler</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. USES -->
+<section class="slide" id="s3">
+  <div class="chapter">2 · Everyday life</div>
+  <h2>Where do we use magnets?</h2>
+  <div class="uses" style="height:calc(100% - 120px)">
+    <div class="use"><div class="ic">🎧</div><div><h3>Speakers &amp; microphones</h3><p>Inside headphones, phone speakers and microphones.</p></div></div>
+    <div class="use"><div class="ic">🚪</div><div><h3>Doors &amp; cupboards</h3><p>Fridge doors and cupboard latches stay firmly shut.</p></div></div>
+    <div class="use"><div class="ic">✏️</div><div><h3>Stationery &amp; accessories</h3><p>Pencil-box catches, paper-clip holders, phone flip covers, fridge magnets.</p></div></div>
+    <div class="use"><div class="ic">🏗️</div><div><h3>Machines &amp; appliances</h3><p>Induction cooktops and giant cranes that lift scrap iron.</p></div></div>
+  </div>
+</section>
+
+<!-- 4. TYPES -->
+<section class="slide" id="s4">
+  <div class="two">
+    <div>
+      <div class="chapter">3 · Shapes</div>
+      <h2>Types of magnets</h2>
+      <div class="typebar" id="typebar">
+        <button data-t="bar" class="on">Bar</button>
+        <button data-t="horseshoe">U-shape / Horseshoe</button>
+        <button data-t="cylinder">Cylindrical</button>
+        <button data-t="ring">Ring</button>
+        <button data-t="button">Button</button>
+        <button data-t="electro">Electromagnet</button>
+      </div>
+      <div id="typeDesc" class="panel"></div>
+      <p class="hint">Click a shape to see it in 3D. Drag the model to look around.</p>
+    </div>
+    <div class="stage">
+      <canvas id="c4"></canvas>
+      <div class="tools"><button class="btn small" id="currentBtn" style="display:none">Switch current ON</button></div>
+      <div class="tag">Red = North pole · Blue = South pole</div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. MAGNETIC VS NON-MAGNETIC -->
+<section class="slide" id="s5">
+  <div class="chapter">4 · Materials</div>
+  <h2>Magnetic or not? Tap to test!</h2>
+  <div class="sorter" style="height:calc(100% - 120px)">
+    <div>
+      <div class="items" id="items"></div>
+      <div id="sortMsg" style="margin-top:12px"></div>
+    </div>
+    <div class="zones">
+      <div class="zone yes"><h3><span class="mag" style="width:70px;height:26px;font-size:14px"><span class="n">N</span><span class="s">S</span></span> Sticks to magnet – Magnetic</h3><div class="dropped" id="zoneYes"></div></div>
+      <div class="zone no"><h3>🚫 Doesn't stick – Non-magnetic</h3><div class="dropped" id="zoneNo"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. POLES -->
+<section class="slide" id="s6">
+  <div class="two">
+    <div>
+      <div class="chapter">5 · Poles</div>
+      <h2>Every magnet has two poles</h2>
+      <ul class="dots">
+        <li><strong>North pole (N)</strong> and <strong>South pole (S)</strong> – the two ends.</li>
+        <li>Pull is <strong>strongest at the poles</strong> – iron filings crowd at the ends, not the middle.</li>
+        <li><strong>Poles always come in pairs.</strong> Cut a magnet – each piece gets its own N and S!</li>
+      </ul>
+      <div class="cutwrap" style="margin-top:22px">
+        <div class="scissor">✂️</div>
+        <div class="cutdemo" id="cutdemo">
+          <div class="half l"><span>N</span><span class="new">S</span></div>
+          <div class="half r"><span class="new">N</span><span>S</span></div>
+        </div>
+      </div>
+      <div style="text-align:center"><button class="btn" id="cutBtn">Cut the magnet</button></div>
+    </div>
+    <div class="stage">
+      <canvas id="c6"></canvas>
+      <div class="tag">Iron filings gather at the poles</div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. DIRECTION -->
+<section class="slide" id="s7">
+  <div class="two">
+    <div>
+      <div class="chapter">6A · Directive property</div>
+      <h2>Magnets find directions</h2>
+      <ul class="dots">
+        <li>A freely hanging bar magnet always rests in the <strong>North–South</strong> direction.</li>
+        <li>The end pointing north is the <strong>North pole</strong>; the other end is the <strong>South pole</strong>.</li>
+        <li>Why? The <strong>Earth itself is a giant magnet</strong>.</li>
+        <li>A <strong>compass</strong> uses this – a tiny magnetic needle that spins freely and settles pointing north.</li>
+      </ul>
+      <button class="btn" id="spinBtn" style="margin-top:14px">Spin the compass needle</button>
+    </div>
+    <div class="compasswrap">
+      <svg class="compass" viewBox="0 0 300 300" aria-label="Compass">
+        <circle cx="150" cy="150" r="140" fill="#1B2E57" stroke="#3B5590" stroke-width="6"/>
+        <circle cx="150" cy="150" r="118" fill="none" stroke="#2A4179" stroke-width="2"/>
+        <g font-family="Fredoka" font-weight="700" font-size="26" fill="#F3F6FF" text-anchor="middle">
+          <text x="150" y="50" fill="#FFD449">N</text><text x="150" y="268">S</text><text x="262" y="160">E</text><text x="38" y="160">W</text>
+        </g>
+        <g stroke="#3B5590" stroke-width="3"><line x1="150" y1="20" x2="150" y2="34"/><line x1="150" y1="266" x2="150" y2="280"/><line x1="20" y1="150" x2="34" y2="150"/><line x1="266" y1="150" x2="280" y2="150"/></g>
+        <g id="needle">
+          <polygon points="150,58 138,150 162,150" fill="#FF4D5A"/>
+          <polygon points="150,242 138,150 162,150" fill="#3D8BFF"/>
+          <circle cx="150" cy="150" r="9" fill="#F3F6FF"/>
+        </g>
+      </svg>
+      <svg class="earth" viewBox="0 0 300 300" aria-label="Earth as a giant magnet">
+        <defs><radialGradient id="eg" cx="40%" cy="35%"><stop offset="0" stop-color="#5FB8FF"/><stop offset="1" stop-color="#1F5FB8"/></radialGradient></defs>
+        <circle cx="150" cy="150" r="120" fill="url(#eg)"/>
+        <path d="M95 90c25-20 60 10 70-10 20 20-5 60 20 70-30 25-60-5-80 20-15-30 20-55-10-80z" fill="#4CAF50" opacity=".8"/>
+        <path d="M60 170c30-10 40 30 70 20 10 30-30 40-40 30-20-5-40-30-30-50z" fill="#4CAF50" opacity=".8"/>
+        <g transform="rotate(-11 150 150)">
+          <rect x="132" y="50" width="36" height="100" rx="6" fill="#3D8BFF"/>
+          <rect x="132" y="150" width="36" height="100" rx="6" fill="#FF4D5A"/>
+          <text x="150" y="80" font-family="Fredoka" font-weight="700" font-size="22" fill="#fff" text-anchor="middle">S</text>
+          <text x="150" y="228" font-family="Fredoka" font-weight="700" font-size="22" fill="#fff" text-anchor="middle">N</text>
+        </g>
+        <text x="150" y="292" font-family="Nunito" font-weight="800" font-size="15" fill="#A9B6D3" text-anchor="middle">Earth behaves like a giant bar magnet</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- 8. ATTRACT & REPEL -->
+<section class="slide" id="s8">
+  <div class="chapter">6B · Attraction and repulsion</div>
+  <h2>Unlike poles attract, like poles repel</h2>
+  <div class="ar" style="height:calc(100% - 120px)">
+    <div class="arena" id="arena">
+      <div class="force" id="force"></div>
+      <div class="mag" id="magL"><span class="n">N</span><span class="s">S</span></div>
+      <div class="mag" id="magR"><span class="n">N</span><span class="s">S</span></div>
+    </div>
+    <div class="flipbtns">
+      <button class="btn ghost" id="flipL">↻ Flip left magnet</button>
+      <button class="btn ghost" id="flipR">Flip right magnet ↻</button>
+    </div>
+    <ul class="dots" style="max-width:720px;margin:0 auto">
+      <li><strong>Unlike poles attract:</strong> N ↔ S pull toward each other.</li>
+      <li><strong>Like poles repel:</strong> N ← → N or S ← → S push each other away.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 9. THROUGH MATERIALS -->
+<section class="slide" id="s9">
+  <div class="two">
+    <div>
+      <div class="chapter">6C · Magnetic effect</div>
+      <h2>Magnetism passes through things</h2>
+      <ul class="dots">
+        <li>A magnet's pull can act <strong>through non-magnetic materials</strong>.</li>
+        <li>Paper, cardboard and thin wooden planks do not block it.</li>
+        <li>Try it: move a magnet under a sheet of paper – a paper clip on top follows it!</li>
+      </ul>
+    </div>
+    <div class="stage" style="display:flex;align-items:center">
+      <div class="through">
+        <div class="clip">📎</div>
+        <div class="sheet"></div>
+        <div class="under"><div class="mag"><span class="n">N</span><span class="s">S</span></div></div>
+      </div>
+      <div class="tag">The clip on top follows the magnet below the sheet</div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. MAGNETIZATION -->
+<section class="slide" id="s10">
+  <div class="two">
+    <div>
+      <div class="chapter">7 · Make your own magnet</div>
+      <h2>Magnetization</h2>
+      <ol style="padding-left:26px;display:grid;gap:8px">
+        <li>Place a steel needle flat on a wooden table.</li>
+        <li>Put one pole of a bar magnet on one end of the needle.</li>
+        <li>Stroke the magnet along the needle in <strong>one direction only</strong>.</li>
+        <li>Lift it at the far end, bring it back to the start, and stroke again.</li>
+        <li>Repeat <strong>30 to 50 times</strong> – the needle becomes a magnet!</li>
+      </ol>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:20px">
+        <button class="btn" id="strokeBtn">Start stroking</button>
+        <div>Strokes: <span id="strokeCount">0</span> / 30</div>
+      </div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center">
+      <div class="magz" id="magz">
+        <div class="stroker"><div class="mag v"><span class="n">N</span><span class="s">S</span></div></div>
+        <div class="needle"></div>
+        <div class="pins"><span>📎📎</span><span>📎📎</span></div>
+      </div>
+      <div class="tag" id="magzTag">Same direction every time!</div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. CARE -->
+<section class="slide" id="s11">
+  <div class="chapter">8 · Care and storage</div>
+  <h2>Keep your magnets strong</h2>
+  <div class="care" style="height:calc(100% - 120px)">
+    <div class="panel">
+      <h3>❌ Magnets lose their power if you…</h3>
+      <ul class="dots">
+        <li>Heat them over a flame</li>
+        <li>Hammer or hit them with hard objects</li>
+        <li>Drop them again and again from a height</li>
+        <li>Keep them next to phones, TVs or remote controls</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>✅ Store them properly</h3>
+      <ul class="dots">
+        <li>Keep bar magnets in <strong>pairs</strong>, opposite poles side by side</li>
+        <li>Put a piece of <strong>wood or plastic</strong> between them</li>
+        <li>Place <strong>soft iron keepers</strong> across the ends</li>
+      </ul>
+      <div class="store">
+        <div class="keeper a"></div><div class="keeper b"></div>
+        <div class="mag"><span class="n">N</span><span class="s">S</span></div>
+        <div class="wood"></div>
+        <div class="mag flip"><span class="n">N</span><span class="s">S</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12. RECAP -->
+<section class="slide" id="s12">
+  <div class="chapter">Recap</div>
+  <h2>What we learned today</h2>
+  <div class="recap" style="height:calc(100% - 120px)">
+    <div class="panel"><div class="ic">🧲</div><h3>Attracts iron</h3><p>Also nickel, cobalt and steel. Not wood, plastic, glass, paper, copper or silver.</p></div>
+    <div class="panel"><div class="ic">🔴🔵</div><h3>Two poles, always</h3><p>N and S. Strongest at the ends. Cut it and you get two new magnets.</p></div>
+    <div class="panel"><div class="ic">🧭</div><h3>Points north–south</h3><p>Because Earth is a giant magnet. That's how a compass works.</p></div>
+    <div class="panel"><div class="ic">↔️</div><h3>Attract &amp; repel</h3><p>Unlike poles attract, like poles push away.</p></div>
+    <div class="panel"><div class="ic">📎</div><h3>Works through paper</h3><p>Magnetism passes through non-magnetic materials.</p></div>
+    <div class="panel"><div class="ic">🛠️</div><h3>Make &amp; keep</h3><p>Stroke a needle 30–50 times to magnetize. Don't heat, hit or drop magnets.</p></div>
+  </div>
+</section>
+
+
+<!-- ===== EXERCISE DIVIDER ===== -->
+<section class="slide" id="e0">
+  <div class="divider">
+    <div class="chapter">NCERT · Chapter 4</div>
+    <h1>Let's practise!</h1>
+    <p>Eleven exercise questions. Read the question, guess the answer, then click to check it.</p>
+  </div>
+</section>
+
+<!-- Q1 fill in the blanks -->
+<section class="slide" id="e1">
+  <div class="chapter">Question 1</div>
+  <h2>Fill in the blanks</h2>
+  <p class="qtext">Click each blank to reveal the answer.</p>
+  <ol class="qs">
+    <li><span class="num">(i)</span><p>Unlike poles of two magnets <span class="blank" data-a="attract">attract</span> each other, whereas like poles <span class="blank" data-a="repel">repel</span> each other.</p></li>
+    <li><span class="num">(ii)</span><p>The materials that are attracted towards a magnet are called <span class="blank" data-a="magnetic materials">magnetic materials</span>.</p></li>
+    <li><span class="num">(iii)</span><p>The needle of a magnetic compass rests along the <span class="blank" data-a="north-south">north-south</span> direction.</p></li>
+    <li><span class="num">(iv)</span><p>A magnet always has <span class="blank" data-a="two">two</span> poles.</p></li>
+  </ol>
+  <button class="btn" style="margin-top:22px" onclick="document.querySelectorAll('.blank').forEach(b=>b.classList.add('rev'))">Reveal all</button>
+</section>
+
+<!-- Q2 true/false -->
+<section class="slide" id="e2">
+  <div class="chapter">Question 2</div>
+  <h2>True or False?</h2>
+  <div class="tf" id="tf">
+    <div class="row" data-a="F"><p>(i) A magnet can be broken into pieces to obtain a single pole.</p><div class="tfb"><button>T</button><button>F</button></div><div class="why">False – poles always exist in pairs. Every piece gets its own N and S.</div></div>
+    <div class="row" data-a="T"><p>(ii) Similar poles of a magnet repel each other.</p><div class="tfb"><button>T</button><button>F</button></div><div class="why">True – like poles repel, unlike poles attract.</div></div>
+    <div class="row" data-a="F"><p>(iii) Iron filings mostly stick in the middle of a bar magnet when it is brought near them.</p><div class="tfb"><button>T</button><button>F</button></div><div class="why">False – most filings stick near the ends (poles), where the magnet is strongest.</div></div>
+    <div class="row" data-a="T"><p>(iv) A freely suspended bar magnet always aligns with the north-south direction.</p><div class="tfb"><button>T</button><button>F</button></div><div class="why">True – this is the directive property of a magnet.</div></div>
+  </div>
+</section>
+
+<!-- Q3 columns -->
+<section class="slide" id="e3">
+  <div class="chapter">Question 3</div>
+  <h2>Which poles face each other?</h2>
+  <p class="qtext">Column I shows the poles placed near each other, Column II the result. Click a row to fill the blank and watch what happens.</p>
+  <div class="pairs" id="pairs">
+    <div class="pair" data-l="N" data-r="N" data-res="Repulsion"><div class="demo"><div class="pole N">N</div><div class="pole N">N</div></div><div class="res">N – N &nbsp;→&nbsp; <b>________</b></div><button class="btn small ghost">Check</button></div>
+    <div class="pair" data-l="N" data-r="S" data-res="Attraction" data-hide="r"><div class="demo"><div class="pole N">N</div><div class="pole Q">?</div></div><div class="res">N – <b>__</b> &nbsp;→&nbsp; Attraction</div><button class="btn small ghost">Check</button></div>
+    <div class="pair" data-l="S" data-r="N" data-res="Attraction"><div class="demo"><div class="pole S">S</div><div class="pole N">N</div></div><div class="res">S – N &nbsp;→&nbsp; <b>________</b></div><button class="btn small ghost">Check</button></div>
+    <div class="pair" data-l="S" data-r="S" data-res="Repulsion" data-hide="l"><div class="demo"><div class="pole Q">?</div><div class="pole S">S</div></div><div class="res"><b>__</b> – S &nbsp;→&nbsp; Repulsion</div><button class="btn small ghost">Check</button></div>
+  </div>
+</section>
+
+<!-- Q4 Atharv -->
+<section class="slide" id="e4">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 4</div>
+      <h2>Atharv rolls a magnet over U-clips</h2>
+      <p class="qtext">He rolled a bar magnet over a heap of steel U-clips. How many clips stick at positions A, B and C?</p>
+      <button class="btn" id="rollBtn">Roll the magnet</button>
+      <div class="ans" id="ans4"><p><strong>Option (i): A = 10, B = 2, C = 10.</strong></p><p>Magnetic strength is strongest at the poles (ends A and C) and weakest in the middle (B).</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center">
+      <div class="roll">
+        <div class="mag"><span class="n">N</span><span class="s">S</span></div>
+        <div class="pos A"><div class="lbl">A</div><div class="clips" data-n="10"></div><div class="cnt">0</div></div>
+        <div class="pos B"><div class="lbl">B</div><div class="clips" data-n="2"></div><div class="cnt">0</div></div>
+        <div class="pos C"><div class="lbl">C</div><div class="clips" data-n="10"></div><div class="cnt">0</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Q5 Reshma -->
+<section class="slide" id="e5">
+  <div class="chapter">Question 5</div>
+  <h2>Reshma's three metal bars</h2>
+  <p class="qtext">Three identical bars: two are magnets, one is plain iron. Without using anything else, find the two magnets. Test the bars pair by pair!</p>
+  <div class="bars" id="bars"><div class="force" id="barsForce">Pick a pair to test</div><div class="bar" id="barA">P</div><div class="bar" id="barB">Q</div></div>
+  <div class="testbtns">
+    <button class="btn ghost" data-pair="PQ">Test P &amp; Q</button>
+    <button class="btn ghost" data-pair="QR">Test Q &amp; R</button>
+    <button class="btn ghost" data-pair="PR">Test P &amp; R</button>
+  </div>
+  <div class="ans" id="ans5"><p>Bring the ends of the bars close to each other, pair by pair. <strong>The two bars that repel each other are the magnets.</strong> A plain iron bar is attracted by both poles of a magnet and never repels.</p></div>
+</section>
+
+<!-- Q6 find poles with a marked magnet -->
+<section class="slide" id="e6">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 6</div>
+      <h2>Find the poles using a marked magnet</h2>
+      <p class="qtext">The grey magnet has no markings. Bring the known North pole of the marked magnet near each end and watch.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn ghost" data-side="left">Bring N near left end</button>
+        <button class="btn ghost" data-side="right">Bring N near right end</button>
+      </div>
+      <div class="ans" id="ans6"><p>If an end is <strong>repelled</strong> by the known N pole, that end is <strong>North</strong>. If it is <strong>attracted</strong>, that end is <strong>South</strong>.</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center;padding:20px">
+      <div class="unm" id="unm" style="width:100%">
+        <div class="mag target"><span class="q1">?</span><span class="q2">?</span></div>
+        <div class="known"><div class="mag flip"><span class="n">N</span><span class="s">S</span></div></div>
+        <div class="note" id="unmNote">Known magnet: N pole facing up-left</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Q7 suspend freely -->
+<section class="slide" id="e7">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 7</div>
+      <h2>Find the North pole without another magnet</h2>
+      <p class="qtext">The bar magnet has no markings and you have no second magnet. How do you find its North pole?</p>
+      <button class="btn" id="hangBtn">Let it hang freely</button>
+      <div class="ans" id="ans7"><p>Tie a thread to the middle of the magnet and suspend it so it can turn freely. When it comes to rest, <strong>the end pointing towards geographic North is its North pole</strong>.</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center;justify-content:center" id="hangStage">
+      <svg viewBox="0 0 300 300" style="width:min(100%,380px)">
+        <g font-family="Fredoka" font-weight="700" font-size="20" fill="#A9B6D3" text-anchor="middle"><text x="150" y="24" fill="#FFD449">N (geographic)</text><text x="150" y="292">S</text><text x="280" y="156">E</text><text x="22" y="156">W</text></g>
+        <line x1="150" y1="30" x2="150" y2="150" stroke="#A9B6D3" stroke-width="2" stroke-dasharray="4 4"/>
+        <g id="hang">
+          <rect x="136" y="50" width="28" height="100" rx="6" fill="#8a94a8"/>
+          <rect x="136" y="150" width="28" height="100" rx="6" fill="#8a94a8"/>
+          <text x="150" y="80" font-family="Fredoka" font-weight="700" font-size="20" fill="#fff" text-anchor="middle" class="hlbl">?</text>
+          <text x="150" y="230" font-family="Fredoka" font-weight="700" font-size="20" fill="#fff" text-anchor="middle" class="hlbl">?</text>
+          <circle cx="150" cy="150" r="5" fill="#FFD449"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Q8 earth poles -->
+<section class="slide" id="e8">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 8</div>
+      <h2>Where are Earth's magnetic poles?</h2>
+      <p class="qtext">If Earth is a magnet, can we guess its poles by looking at a compass?</p>
+      <button class="btn" id="earthBtn">Place compasses on Earth</button>
+      <div class="ans" id="ans8"><p>Yes! The N pole of every compass needle points to geographic North. Unlike poles attract, so the magnetic pole near geographic North must be a <strong>magnetic South pole</strong>, and the one near geographic South is a <strong>magnetic North pole</strong>.</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center;justify-content:center" id="earth8">
+      <svg viewBox="0 0 320 320" style="width:min(100%,400px)">
+        <defs><radialGradient id="eg2" cx="40%" cy="35%"><stop offset="0" stop-color="#5FB8FF"/><stop offset="1" stop-color="#1F5FB8"/></radialGradient></defs>
+        <text x="160" y="22" font-family="Fredoka" font-weight="700" font-size="16" fill="#A9B6D3" text-anchor="middle">Geographic North</text>
+        <text x="160" y="312" font-family="Fredoka" font-weight="700" font-size="16" fill="#A9B6D3" text-anchor="middle">Geographic South</text>
+        <circle cx="160" cy="165" r="120" fill="url(#eg2)"/>
+        <g transform="rotate(-11 160 165)">
+          <rect x="146" y="70" width="28" height="95" rx="6" fill="#3D8BFF" opacity=".9"/>
+          <rect x="146" y="165" width="28" height="95" rx="6" fill="#FF4D5A" opacity=".9"/>
+          <text x="160" y="98" font-family="Fredoka" font-weight="700" font-size="20" fill="#fff" text-anchor="middle" class="polelbl">S</text>
+          <text x="160" y="240" font-family="Fredoka" font-weight="700" font-size="20" fill="#fff" text-anchor="middle" class="polelbl">N</text>
+        </g>
+        <g class="cn"><g transform="translate(60,165)"><circle r="18" fill="#1B2E57" stroke="#3B5590" stroke-width="2"/><polygon points="0,-14 -4,0 4,0" fill="#FF4D5A"/><polygon points="0,14 -4,0 4,0" fill="#3D8BFF"/></g></g>
+        <g class="cn"><g transform="translate(260,165)"><circle r="18" fill="#1B2E57" stroke="#3B5590" stroke-width="2"/><polygon points="0,-14 -4,0 4,0" fill="#FF4D5A"/><polygon points="0,14 -4,0 4,0" fill="#3D8BFF"/></g></g>
+        <g class="cn"><g transform="translate(230,80)"><circle r="18" fill="#1B2E57" stroke="#3B5590" stroke-width="2"/><polygon points="0,-14 -4,0 4,0" fill="#FF4D5A"/><polygon points="0,14 -4,0 4,0" fill="#3D8BFF"/></g></g>
+        <g class="cn"><g transform="translate(90,250)"><circle r="18" fill="#1B2E57" stroke="#3B5590" stroke-width="2"/><polygon points="0,-14 -4,0 4,0" fill="#FF4D5A"/><polygon points="0,14 -4,0 4,0" fill="#3D8BFF"/></g></g>
+        <text class="polelbl" x="230" y="52" font-family="Nunito" font-weight="800" font-size="14" fill="#FFD449" text-anchor="middle">magnetic S pole here</text>
+        <text class="polelbl" x="90" y="292" font-family="Nunito" font-weight="800" font-size="14" fill="#FFD449" text-anchor="middle">magnetic N pole here</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Q9 mechanic -->
+<section class="slide" id="e9">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 9</div>
+      <h2>The mechanic's falling screws</h2>
+      <p class="qtext">While repairing a gadget, the steel screws keep falling off the screwdriver. How can the mechanic fix this?</p>
+      <button class="btn" id="sdBtn">Rub the screwdriver with a magnet</button>
+      <div class="ans" id="ans9"><p>Rub the tip of the screwdriver with a permanent magnet to <strong>magnetise</strong> it. The magnetised tip holds the steel screws by magnetic attraction, so they don't fall.</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center">
+      <div class="sd" id="sd">
+        <div class="tool"></div>
+        <div class="sparkle">✨</div>
+        <div class="screw">🔩</div><div class="screw">🔩</div><div class="screw">🔩</div>
+        <div class="floor"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Q10 ring magnets -->
+<section class="slide" id="e10">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 10</div>
+      <h2>The floating ring magnet</h2>
+      <p class="qtext">Ring magnet X stays floating above ring magnet Y on a wooden stand. Why? How can we make X touch Y without pushing either magnet?</p>
+      <button class="btn" id="flipXBtn">Flip magnet X</button>
+      <div class="ans" id="ans10"><p><strong>Reason:</strong> the facing surfaces of X and Y are like poles, so they repel.</p><p><strong>Solution:</strong> remove X, turn it upside down and slide it back. Now unlike poles face each other, so X is attracted and drops down to touch Y.</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center;justify-content:center">
+      <div class="stand" id="stand">
+        <div class="stick"></div>
+        <div class="ring Y"><b>Y</b></div>
+        <div class="ring X"><b>X</b></div>
+        <div class="base"></div>
+        <div class="facing" id="facingTxt">Facing: N ↔ N<br>Repel!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Q11 polarity puzzle -->
+<section class="slide" id="e11">
+  <div class="two">
+    <div>
+      <div class="chapter">Question 11</div>
+      <h2>Find the polarity of each end</h2>
+      <p class="qtext">Three magnets are joined end to end. End 5 is North. Work out ends 6, 4, 3, 2 and 1 one step at a time.</p>
+      <button class="btn" id="q11Btn">Next step</button>
+      <div class="ans show" id="ans11" style="border-color:var(--yellow)"><p id="q11Txt">End 5 is <strong>N</strong> (given).</p></div>
+    </div>
+    <div class="stage" style="display:flex;align-items:center;justify-content:center">
+      <svg class="q11" viewBox="0 0 440 360" style="width:min(100%,460px)">
+        <rect id="h6" x="40" y="280" width="80" height="40" rx="6" fill="#55617a"/><rect id="h5" x="120" y="280" width="80" height="40" rx="6" fill="#FF4D5A"/>
+        <rect id="h4" x="200" y="200" width="40" height="80" rx="6" fill="#55617a"/><rect id="h3" x="200" y="120" width="40" height="80" rx="6" fill="#55617a"/>
+        <rect id="h2" x="240" y="80" width="80" height="40" rx="6" fill="#55617a"/><rect id="h1" x="320" y="80" width="80" height="40" rx="6" fill="#55617a"/>
+        <text id="t6" x="60" y="308">?</text><text id="t5" x="180" y="308">N</text>
+        <text id="t4" x="220" y="268">?</text><text id="t3" x="220" y="148">?</text>
+        <text id="t2" x="260" y="108">?</text><text id="t1" x="380" y="108">?</text>
+        <g class="end"><text x="40" y="340">6</text><text x="200" y="340">5</text><text x="255" y="270">4</text><text x="255" y="135">3</text><text x="240" y="70">2</text><text x="400" y="70">1</text></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav">
+  <div id="count">1 / 12</div>
+  <div id="dots"></div>
+  <div class="navgroup">
+    <button class="navbtn" id="prevBtn" aria-label="Previous slide">‹</button>
+    <button class="navbtn" id="nextBtn" aria-label="Next slide">›</button>
+    <button class="navbtn" id="fsBtn" aria-label="Fullscreen" title="Fullscreen (F)">⛶</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ================= DECK NAVIGATION ================= */
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const dots=document.getElementById('dots');
+slides.forEach((_,i)=>{const d=document.createElement('span');d.addEventListener('click',()=>go(i));dots.appendChild(d);});
+function go(n){
+  n=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>{s.classList.toggle('active',i===n);s.classList.toggle('prev',i<n);});
+  [...dots.children].forEach((d,i)=>d.classList.toggle('on',i===n));
+  document.getElementById('count').textContent=(n+1)+' / '+slides.length;
+  cur=n;
+  onSlideShown(n);
+}
+document.getElementById('prevBtn').onclick=()=>go(cur-1);
+document.getElementById('nextBtn').onclick=()=>go(cur+1);
+document.getElementById('fsBtn').onclick=toggleFS;
+function toggleFS(){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1);}
+  else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur-1);}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  else if(e.key.toLowerCase()==='f')toggleFS();
+});
+let tx=null;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+document.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)go(cur+(dx<0?1:-1));tx=null;});
+
+/* ================= 3D HELPERS (three.js) ================= */
+const has3D=typeof THREE!=='undefined';
+const MAT={
+  red:()=>new THREE.MeshStandardMaterial({color:0xff4d5a,roughness:.45,metalness:.15}),
+  blue:()=>new THREE.MeshStandardMaterial({color:0x3d8bff,roughness:.45,metalness:.15}),
+  iron:()=>new THREE.MeshStandardMaterial({color:0x8a94a8,roughness:.35,metalness:.7}),
+  filing:()=>new THREE.MeshStandardMaterial({color:0x3a4356,roughness:.5,metalness:.8}),
+  copper:()=>new THREE.MeshStandardMaterial({color:0xc47a3a,roughness:.3,metalness:.8,emissive:0x000000}),
+};
+function label(text,size){
+  const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+  g.font='bold 96px Fredoka, Arial';g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';
+  g.shadowColor='rgba(0,0,0,.5)';g.shadowBlur=8;g.fillText(text,64,66);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));
+  sp.scale.set(size||.5,size||.5,1);return sp;
+}
+function barMagnet(len=2.6,h=.6){
+  const g=new THREE.Group();
+  const n=new THREE.Mesh(new THREE.BoxGeometry(len/2,h,h),MAT.red());n.position.x=len/4;
+  const s=new THREE.Mesh(new THREE.BoxGeometry(len/2,h,h),MAT.blue());s.position.x=-len/4;
+  const ln=label('N');ln.position.x=len/2+.3;const ls=label('S');ls.position.x=-len/2-.3;
+  g.add(n,s,ln,ls);g.userData.poles=[new THREE.Vector3(len/2,0,0),new THREE.Vector3(-len/2,0,0)];
+  return g;
+}
+function horseshoe(){
+  const g=new THREE.Group();
+  const arc=new THREE.Mesh(new THREE.TorusGeometry(1,.3,18,48,Math.PI),MAT.iron());g.add(arc);
+  const legN=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.6),MAT.red());legN.position.set(1,-.5,0);
+  const legS=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.6),MAT.blue());legS.position.set(-1,-.5,0);
+  const ln=label('N');ln.position.set(1,-1.35,0);const ls=label('S');ls.position.set(-1,-1.35,0);
+  g.add(legN,legS,ln,ls);g.position.y=.4;
+  g.userData.poles=[new THREE.Vector3(1,-1,0),new THREE.Vector3(-1,-1,0)];
+  return g;
+}
+function cylinderMagnet(){
+  const g=new THREE.Group();
+  const n=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,1.3,40),MAT.red());n.position.y=.65;
+  const s=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,1.3,40),MAT.blue());s.position.y=-.65;
+  const ln=label('N');ln.position.y=1.6;const ls=label('S');ls.position.y=-1.6;
+  g.add(n,s,ln,ls);g.rotation.z=Math.PI/2;g.rotation.x=.3;
+  g.userData.poles=[new THREE.Vector3(1.3,0,0),new THREE.Vector3(-1.3,0,0)];
+  return g;
+}
+function ringMagnet(){
+  const g=new THREE.Group();
+  const shape=new THREE.Shape();shape.absarc(0,0,1.1,0,Math.PI*2,false);
+  const hole=new THREE.Path();hole.absarc(0,0,.45,0,Math.PI*2,true);shape.holes.push(hole);
+  const body=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth:.35,bevelEnabled:false}),MAT.iron());body.position.z=-.175;
+  const top=new THREE.Mesh(new THREE.RingGeometry(.45,1.1,48),MAT.red());top.position.z=.18;
+  const bot=new THREE.Mesh(new THREE.RingGeometry(.45,1.1,48),MAT.blue());bot.position.z=-.18;bot.rotation.y=Math.PI;
+  const ln=label('N',.45);ln.position.set(0,0,.5);const ls=label('S',.45);ls.position.set(0,0,-.5);
+  g.add(body,top,bot,ln,ls);g.rotation.x=-.9;
+  g.userData.poles=[new THREE.Vector3(0,0,.3),new THREE.Vector3(0,0,-.3)];
+  return g;
+}
+function buttonMagnet(){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.75,.75,.3,48),MAT.iron());
+  const top=new THREE.Mesh(new THREE.CircleGeometry(.75,48),MAT.red());top.rotation.x=-Math.PI/2;top.position.y=.151;
+  const bot=new THREE.Mesh(new THREE.CircleGeometry(.75,48),MAT.blue());bot.rotation.x=Math.PI/2;bot.position.y=-.151;
+  const ln=label('N',.45);ln.position.y=.5;const ls=label('S',.45);ls.position.y=-.5;
+  g.add(body,top,bot,ln,ls);g.rotation.x=.5;
+  g.userData.poles=[new THREE.Vector3(0,.2,0),new THREE.Vector3(0,-.2,0)];
+  return g;
+}
+function electromagnet(){
+  const g=new THREE.Group();
+  const core=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,2.6,32),MAT.iron());core.rotation.z=Math.PI/2;g.add(core);
+  const coilMat=MAT.copper();g.userData.coilMat=coilMat;
+  for(let i=0;i<14;i++){const t=new THREE.Mesh(new THREE.TorusGeometry(.38,.06,10,32),coilMat);t.rotation.y=Math.PI/2;t.position.x=-.9+i*.14;g.add(t);}
+  // battery + wires
+  const bat=new THREE.Mesh(new THREE.BoxGeometry(.9,.4,.4),new THREE.MeshStandardMaterial({color:0x2b2f3a,roughness:.6}));bat.position.set(0,-1.5,0);
+  const cap=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,.12,16),MAT.iron());cap.rotation.z=Math.PI/2;cap.position.set(.5,-1.5,0);
+  const pts=[new THREE.Vector3(-.9,-.1,0),new THREE.Vector3(-1.4,-.1,0),new THREE.Vector3(-1.4,-1.5,0),new THREE.Vector3(-.45,-1.5,0)];
+  const pts2=[new THREE.Vector3(.92,-.1,0),new THREE.Vector3(1.4,-.1,0),new THREE.Vector3(1.4,-1.5,0),new THREE.Vector3(.56,-1.5,0)];
+  const wireMat=new THREE.LineBasicMaterial({color:0xc47a3a});
+  g.add(bat,cap,new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),wireMat),new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),wireMat));
+  g.position.y=.5;
+  g.userData.poles=[new THREE.Vector3(1.3,0,0),new THREE.Vector3(-1.3,0,0)];
+  g.userData.electro=true;
+  return g;
+}
+function makeFilings(poles,count,spread){
+  const grp=new THREE.Group();const geo=new THREE.BoxGeometry(.035,.035,.2);const mat=MAT.filing();
+  for(let i=0;i<count;i++){
+    const p=poles[i%poles.length];const m=new THREE.Mesh(geo,mat);
+    const dir=new THREE.Vector3(Math.random()-.5,Math.random()-.5,Math.random()-.5).normalize();
+    const target=p.clone().add(dir.multiplyScalar(.18+Math.random()*spread));
+    const start=target.clone().normalize().multiplyScalar(3.2+Math.random()*1.4);
+    m.userData={target,start,delay:Math.random()*.6};m.position.copy(target);m.lookAt(p);
+    grp.add(m);
+  }
+  return grp;
+}
+function Stage(canvas){
+  this.canvas=canvas;this.scene=new THREE.Scene();
+  this.camera=new THREE.PerspectiveCamera(38,1,.1,100);this.camera.position.set(0,1.4,6.2);this.camera.lookAt(0,0,0);
+  this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});this.renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  this.scene.add(new THREE.AmbientLight(0xffffff,.55));
+  const d1=new THREE.DirectionalLight(0xffffff,.9);d1.position.set(3,5,4);const d2=new THREE.DirectionalLight(0x9fc3ff,.35);d2.position.set(-4,2,-3);
+  this.scene.add(d1,d2);
+  this.root=new THREE.Group();this.scene.add(this.root);
+  this.rx=.2;this.ry=0;this.drag=false;this.auto=true;let lx,ly;
+  canvas.addEventListener('pointerdown',e=>{this.drag=true;this.auto=false;lx=e.clientX;ly=e.clientY;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointermove',e=>{if(!this.drag)return;this.ry+=(e.clientX-lx)*.01;this.rx=Math.max(-1.2,Math.min(1.2,this.rx+(e.clientY-ly)*.01));lx=e.clientX;ly=e.clientY;});
+  canvas.addEventListener('pointerup',()=>{this.drag=false;setTimeout(()=>this.auto=true,2500);});
+  this.resize();new ResizeObserver(()=>this.resize()).observe(canvas.parentElement);
+}
+Stage.prototype.resize=function(){const w=this.canvas.parentElement.clientWidth,h=this.canvas.parentElement.clientHeight;if(!w||!h)return;this.renderer.setSize(w,h,false);this.camera.aspect=w/h;this.camera.updateProjectionMatrix();};
+Stage.prototype.render=function(dt){if(this.auto&&!this.drag)this.ry+=dt*.35;this.root.rotation.set(this.rx,this.ry,0);this.renderer.render(this.scene,this.camera);};
+
+/* ---- Build the three 3D stages ---- */
+const stages={};
+if(has3D){
+  // Slide 1 hero: bar magnet + animated filings
+  const s1=new Stage(document.getElementById('c1'));
+  const m1=barMagnet();s1.root.add(m1);
+  const f1=makeFilings(m1.userData.poles,220,.55);s1.root.add(f1);
+  s1.sprinkleAt=performance.now();
+  s1.update=t=>{const el=(t-s1.sprinkleAt)/1000;f1.children.forEach(m=>{const k=Math.min(1,Math.max(0,(el-m.userData.delay)/1.6));const e=1-Math.pow(1-k,3);m.position.lerpVectors(m.userData.start,m.userData.target,e);});};
+  document.getElementById('sprinkle').onclick=()=>s1.sprinkleAt=performance.now();
+  stages[0]=s1;
+
+  // Slide 4 types: switchable models
+  const s4=new Stage(document.getElementById('c4'));
+  const builders={bar:barMagnet,horseshoe:horseshoe,cylinder:cylinderMagnet,ring:ringMagnet,button:buttonMagnet,electro:electromagnet};
+  const descs={
+    bar:['Bar magnet','A straight magnet shaped like a rectangular block (cuboid). The most common magnet in your science lab.'],
+    horseshoe:['U-shaped / Horseshoe magnet','Bent like the letter U or a horse\'s shoe. Both poles are close together, so it grips iron objects strongly.'],
+    cylinder:['Cylindrical magnet','A solid cylinder – like a small rod – with N at one end and S at the other.'],
+    ring:['Ring magnet','Circular with a hole in the centre. One flat face is N, the other is S. Found inside speakers.'],
+    button:['Button magnet','A small, flat disc or capsule-like magnet. Used in pencil-box catches and fridge magnets.'],
+    electro:['Electromagnet','A temporary magnet: insulated copper wire wound around an iron piece. It works only while electric current flows. Switch the current on to see it attract iron filings!']
+  };
+  let model=null,eFilings=null,currentOn=false;
+  const currentBtn=document.getElementById('currentBtn');
+  function showType(t){
+    if(model)s4.root.remove(model);if(eFilings){s4.root.remove(eFilings);eFilings=null;}
+    model=builders[t]();s4.root.add(model);
+    const d=descs[t];document.getElementById('typeDesc').innerHTML='<h3>'+d[0]+'</h3><p>'+d[1]+'</p>';
+    if(t==='electro'){currentOn=false;currentBtn.style.display='';currentBtn.textContent='Switch current ON';}
+    else{currentBtn.style.display='none';const f=makeFilings(model.userData.poles,90,.35);f.children.forEach(m=>m.position.copy(m.userData.target));model.add(f);}
+    document.querySelectorAll('#typebar button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  }
+  document.getElementById('typebar').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showType(b.dataset.t);});
+  currentBtn.onclick=()=>{
+    currentOn=!currentOn;currentBtn.textContent=currentOn?'Switch current OFF':'Switch current ON';
+    model.userData.coilMat.emissive.setHex(currentOn?0x7a3b00:0x000000);
+    if(currentOn){eFilings=makeFilings(model.userData.poles,140,.4);eFilings.children.forEach(m=>m.position.copy(m.userData.target));model.add(eFilings);}
+    else if(eFilings){model.remove(eFilings);eFilings=null;}
+  };
+  showType('bar');stages[3]=s4;
+
+  // Slide 6 poles: filings dense at poles
+  const s6=new Stage(document.getElementById('c6'));
+  const m6=barMagnet(3,.7);s6.root.add(m6);
+  const f6=makeFilings(m6.userData.poles,320,.7);f6.children.forEach(m=>m.position.copy(m.userData.target));s6.root.add(f6);
+  // a few stray filings along the middle to show weak attraction there
+  const mid=makeFilings([new THREE.Vector3(0,.55,0),new THREE.Vector3(0,-.55,0)],10,.15);mid.children.forEach(m=>m.position.copy(m.userData.target));s6.root.add(mid);
+  stages[5]=s6;
+
+  let last=performance.now();
+  (function loop(t){requestAnimationFrame(loop);const dt=Math.min(.05,(t-last)/1000);last=t;const st=stages[cur];if(st){if(st.update)st.update(t);st.render(dt);}})(last);
+}else{
+  document.querySelectorAll('.stage canvas').forEach(c=>{const p=c.parentElement;p.innerHTML='<div style="padding:30px;color:var(--muted)">3D view needs an internet connection to load. The rest of the slides work offline.</div>';});
+}
+function onSlideShown(n){if(stages[n])stages[n].resize();}
+
+/* ================= SLIDE 5: SORT GAME ================= */
+const materials=[
+  ['🔩','Iron nail',true],['🪙','Nickel coin',true],['🥄','Steel spoon',true],['⚙️','Cobalt piece',true],
+  ['🪵','Wood',false],['📏','Plastic scale',false],['🔮','Glass marble',false],['📄','Paper',false],
+  ['👜','Leather bag',false],['🔌','Copper wire',false],['💍','Silver ring',false]
+];
+const itemsEl=document.getElementById('items');
+materials.forEach(([ic,name,mag],i)=>{
+  const b=document.createElement('button');b.className='item';b.innerHTML='<span class="ic">'+ic+'</span>'+name;
+  b.onclick=()=>{
+    const zone=document.getElementById(mag?'zoneYes':'zoneNo');
+    const chip=document.createElement('div');chip.className='chip';chip.innerHTML=ic+' '+name;
+    const from=b.getBoundingClientRect();zone.appendChild(chip);const to=chip.getBoundingClientRect();
+    chip.animate([{transform:`translate(${from.left-to.left}px,${from.top-to.top}px) scale(1.1)`},{transform:'none'}],{duration:600,easing:'cubic-bezier(.3,1.3,.4,1)'});
+    b.classList.add('done');
+    const msg=document.getElementById('sortMsg');msg.className=mag?'ok':'bad';
+    msg.textContent=mag?`✅ ${name} is attracted – it's magnetic!`:`🚫 ${name} does not move – non-magnetic.`;
+  };
+  itemsEl.appendChild(b);
+});
+
+/* ================= SLIDE 6: CUT ================= */
+const cutdemo=document.getElementById('cutdemo'),cutBtn=document.getElementById('cutBtn');
+cutBtn.onclick=()=>{const c=cutdemo.parentElement.classList.toggle('cut');cutdemo.classList.toggle('cut',c);cutBtn.textContent=c?'Join it back':'Cut the magnet';};
+
+/* ================= SLIDE 7: COMPASS ================= */
+const needle=document.getElementById('needle');let angle=0;
+document.getElementById('spinBtn').onclick=()=>{
+  angle+=720+Math.random()*540;
+  needle.style.transition='transform 1.4s cubic-bezier(.3,0,.7,1)';needle.style.transform=`rotate(${angle}deg)`;
+  const settle=()=>{needle.removeEventListener('transitionend',settle);angle=Math.round(angle/360)*360;needle.style.transition='transform 2.2s cubic-bezier(.2,1.6,.4,1)';needle.style.transform=`rotate(${angle}deg)`;};
+  needle.addEventListener('transitionend',settle);
+};
+
+/* ================= SLIDE 8: ATTRACT / REPEL ================= */
+const magL=document.getElementById('magL'),magR=document.getElementById('magR'),arena=document.getElementById('arena'),force=document.getElementById('force');
+function updateAR(){
+  const faceL=magL.classList.contains('flip')?'N':'S';
+  const faceR=magR.classList.contains('flip')?'S':'N';
+  const same=faceL===faceR;
+  arena.classList.toggle('repel',same);arena.classList.toggle('attract',!same);
+  force.textContent=same?`${faceL} and ${faceR} face each other – like poles REPEL`:`${faceL} and ${faceR} face each other – unlike poles ATTRACT`;
+}
+document.getElementById('flipL').onclick=()=>{magL.classList.toggle('flip');updateAR();};
+document.getElementById('flipR').onclick=()=>{magR.classList.toggle('flip');updateAR();};
+updateAR();
+
+/* ================= SLIDE 10: MAGNETIZATION ================= */
+const magz=document.getElementById('magz'),strokeBtn=document.getElementById('strokeBtn'),countEl=document.getElementById('strokeCount'),stroker=magz.querySelector('.stroker');
+let strokes=0;
+strokeBtn.onclick=()=>{
+  if(magz.classList.contains('done')){magz.classList.remove('done');strokes=0;countEl.textContent='0';document.getElementById('magzTag').textContent='Same direction every time!';}
+  const on=magz.classList.toggle('running');strokeBtn.textContent=on?'Pause':'Start stroking';
+};
+stroker.addEventListener('animationiteration',()=>{
+  strokes++;countEl.textContent=strokes;
+  if(strokes>=30){magz.classList.remove('running');magz.classList.add('done');strokeBtn.textContent='Start again';document.getElementById('magzTag').textContent='The needle is now a magnet – paper clips stick to its ends!';}
+});
+
+/* ================= EXERCISE SLIDES ================= */
+// Q1 blanks
+document.querySelectorAll('.blank').forEach(b=>b.addEventListener('click',()=>b.classList.add('rev')));
+
+// Q2 true/false
+document.querySelectorAll('#tf .row').forEach(row=>{
+  row.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
+    if(row.classList.contains('done'))return;
+    const ok=btn.textContent===row.dataset.a;
+    btn.classList.add(ok?'correct':'wrong');
+    if(!ok){row.querySelectorAll('button').forEach(x=>{if(x.textContent===row.dataset.a)x.classList.add('correct');});}
+    row.classList.add('done');
+  });
+});
+
+// Q3 pairs
+document.querySelectorAll('#pairs .pair').forEach(p=>{
+  p.querySelector('button').onclick=()=>{
+    const same=p.dataset.l===p.dataset.r;
+    p.classList.add(same?'repel':'attract');
+    const poles=p.querySelectorAll('.pole');
+    if(p.dataset.hide==='r'){poles[1].className='pole '+p.dataset.r;poles[1].textContent=p.dataset.r;}
+    if(p.dataset.hide==='l'){poles[0].className='pole '+p.dataset.l;poles[0].textContent=p.dataset.l;}
+    p.querySelector('.res').innerHTML=p.dataset.l+' – '+p.dataset.r+' &nbsp;→&nbsp; <b>'+p.dataset.res+'</b>';
+    p.querySelector('button').disabled=true;
+  };
+});
+
+// Q4 roll
+document.getElementById('rollBtn').onclick=()=>{
+  document.querySelectorAll('.pos').forEach(pos=>{
+    const clips=pos.querySelector('.clips'),cnt=pos.querySelector('.cnt'),n=+clips.dataset.n;
+    clips.innerHTML='';cnt.textContent='0';
+    for(let i=0;i<n;i++){const s=document.createElement('span');s.textContent='📎';clips.appendChild(s);setTimeout(()=>{s.classList.add('in');cnt.textContent=i+1;},250+i*160);}
+  });
+  setTimeout(()=>document.getElementById('ans4').classList.add('show'),2200);
+};
+
+// Q5 three bars (P, Q are magnets; R is iron)
+const isMagnet={P:true,Q:true,R:false};
+document.querySelectorAll('.testbtns button').forEach(b=>b.onclick=()=>{
+  const [a,c]=b.dataset.pair.split('');const bars=document.getElementById('bars');
+  document.getElementById('barA').textContent=a;document.getElementById('barB').textContent=c;
+  bars.classList.remove('attract','repel');void bars.offsetWidth;
+  const repel=isMagnet[a]&&isMagnet[c];
+  bars.classList.add(repel?'repel':'attract');
+  document.getElementById('barsForce').textContent=repel?`${a} and ${c} REPEL – both must be magnets!`:`${a} and ${c} only attract – one of them is plain iron`;
+  document.getElementById('ans5').classList.add('show');
+});
+
+// Q6 unmarked magnet
+document.querySelectorAll('#e6 [data-side]').forEach(b=>b.onclick=()=>{
+  const u=document.getElementById('unm');u.classList.remove('toLeft','toRight');void u.offsetWidth;
+  if(b.dataset.side==='left'){u.classList.add('toLeft','leftN');document.getElementById('unmNote').textContent='Left end is pushed away → REPELLED → left end is NORTH';}
+  else{u.classList.add('toRight','rightS');document.getElementById('unmNote').textContent='Right end is pulled closer → ATTRACTED → right end is SOUTH';}
+  document.getElementById('ans6').classList.add('show');
+});
+
+// Q7 hang
+document.getElementById('hangBtn').onclick=()=>{
+  const st=document.getElementById('hangStage');st.classList.add('hung');
+  setTimeout(()=>{const l=st.querySelectorAll('.hlbl');l[0].textContent='N';l[1].textContent='S';st.querySelectorAll('#hang rect')[0].setAttribute('fill','#FF4D5A');st.querySelectorAll('#hang rect')[1].setAttribute('fill','#3D8BFF');document.getElementById('ans7').classList.add('show');},2400);
+};
+
+// Q8 earth
+document.getElementById('earthBtn').onclick=()=>{document.getElementById('earth8').classList.add('e8');document.getElementById('ans8').classList.add('show');};
+
+// Q9 screwdriver
+document.getElementById('sdBtn').onclick=()=>{document.getElementById('sd').classList.add('magnetised');document.getElementById('ans9').classList.add('show');};
+
+// Q10 ring magnets
+const stand=document.getElementById('stand'),flipXBtn=document.getElementById('flipXBtn');
+flipXBtn.onclick=()=>{
+  const f=stand.classList.toggle('flipped');
+  document.getElementById('facingTxt').innerHTML=f?'Facing: S ↔ N<br>Attract – X drops!':'Facing: N ↔ N<br>Repel!';
+  flipXBtn.textContent=f?'Flip it back':'Flip magnet X';
+  document.getElementById('ans10').classList.add('show');
+};
+
+// Q11 polarity steps
+const q11Steps=[
+  ['6','S','End 6 is <strong>S</strong> – the opposite pole of the same (bottom) magnet as end 5.'],
+  ['4','S','End 4 is <strong>S</strong> – it is joined to end 5 (N), and only unlike poles stick together.'],
+  ['3','N','End 3 is <strong>N</strong> – the opposite pole of the middle vertical magnet.'],
+  ['2','S','End 2 is <strong>S</strong> – it is joined to end 3 (N), so it must be the unlike pole.'],
+  ['1','N','End 1 is <strong>N</strong> – the opposite pole of the top horizontal magnet. Done!']
+];
+let q11i=0;
+document.getElementById('q11Btn').onclick=()=>{
+  document.querySelectorAll('.q11 rect').forEach(r=>r.classList.remove('hi'));
+  if(q11i>=q11Steps.length){q11i=0;q11Steps.forEach(([e])=>{document.getElementById('h'+e).setAttribute('fill','#55617a');document.getElementById('t'+e).textContent='?';});document.getElementById('q11Txt').innerHTML='End 5 is <strong>N</strong> (given).';document.getElementById('q11Btn').textContent='Next step';return;}
+  const [e,p,txt]=q11Steps[q11i++];
+  const r=document.getElementById('h'+e);r.setAttribute('fill',p==='N'?'#FF4D5A':'#3D8BFF');r.classList.add('hi');
+  document.getElementById('t'+e).textContent=p;document.getElementById('q11Txt').innerHTML=txt;
+  if(q11i===q11Steps.length)document.getElementById('q11Btn').textContent='Start over';
+};
+
+go(0);
+</script>
+</body>
+</html>
